@@ -1,7 +1,8 @@
 <template>
   <div id="app">
+    <router-view></router-view>
     <div v-if="isLoading" class="loading-indicator"></div>
-    <router-view />
+
     <ScrollToTop />
   </div>
 </template>
@@ -44,4 +45,5 @@ export default {
   100% {
     transform: rotate(360deg);
   }
-}</style>
+}
+</style>

@@ -63,6 +63,10 @@ const routes = [
                 path: '/thank-you',
                 component: () => import('./components/ThankyouPage/index.vue')
             },
+            {
+                path: '/:pathMatch(.*)*', // 
+                component: () => import('./components/404Page.vue')
+            }
         ]
 
     }
