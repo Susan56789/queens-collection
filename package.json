@@ -5,10 +5,12 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "build:css": "tailwindcss build src/assets/css/tailwind.css -o public/css/tailwind.css"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.5.1",
+    "autoprefixer": "^10.4.17",
     "core-js": "^3.8.3",
     "express": "^4.18.2",
     "pg": "^8.11.3",
@@ -23,7 +25,8 @@
     "@vue/cli-plugin-eslint": "~5.0.0",
     "@vue/cli-service": "~5.0.0",
     "eslint": "^7.32.0",
-    "eslint-plugin-vue": "^8.0.3"
+    "eslint-plugin-vue": "^8.0.3",
+    "postcss": "^8.4.33"
   },
   "eslintConfig": {
     "root": true,
