@@ -11,6 +11,58 @@ const routes = [
                 path: '',
                 component: () => import('./components/HomePage.vue')
             },
+            {
+                path: '/about',
+                component: () => import('./components/AboutUs.vue')
+            },
+            {
+                path: '/contact',
+                component: () => import('./components/ContactUs.vue')
+            },
+            {
+                path: '/shop',
+                component: () => import('./components/ShopPage/index.vue')
+            },
+            {
+                path: '/login',
+                component: () => import('./components/LoginPage.vue')
+            },
+            {
+                path: '/logout',
+                component: () => import('./components/LogoutPage.vue')
+            },
+            {
+                path: '/faqs',
+                component: () => import('./components/FaqsPage.vue')
+            },
+            {
+                path: '/password-reset',
+                component: () => import('./components/ForgotPassword.vue')
+            },
+            {
+                path: '/sign-up',
+                component: () => import('./components/NewUser.vue')
+            },
+            {
+                path: '/privacy-policy',
+                component: () => import('./components/PrivacyPolicy.vue')
+            },
+            {
+                path: '/cart',
+                component: () => import('./components/CartPage/index.vue')
+            },
+            {
+                path: '/wishlist',
+                component: () => import('./components/WishList/index.vue')
+            },
+            {
+                path: '/checkout',
+                component: () => import('./components/CheckoutPage/index.vue')
+            },
+            {
+                path: '/thank-you',
+                component: () => import('./components/ThankyouPage/index.vue')
+            },
         ]
 
     }
