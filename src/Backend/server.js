@@ -1,7 +1,7 @@
 const express = require('express');
 const { Pool } = require('pg');
 const bodyParser = require('body-parser');
-const apiRoutes = require('./routes/apiRoutes');
+const apiRoutes = require('./apiRoutes');
 const app = express();
 const port = process.env.PORT || 3000;
 
