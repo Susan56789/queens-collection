@@ -50,7 +50,7 @@
                 </div>
 
                 <div>
-                    <p class="font-semibold text-red-800 dark:text-white">Categories</p>
+                    <p class="font-semibold text-red-800 dark:text-white">All Departments</p>
 
                     <div class="flex flex-col items-start mt-5 space-y-2">
                         <a href="#" class="text-red-600 transition-colors duration-300 dark:text-red-300 
@@ -86,19 +86,19 @@
 
                 <div class="flex -mx-2">
                     <a href="#"
-                        class="mx-2 text-red-600 transition-colors duration-300 dark:text-red-300 hover:text-white-500 dark:hover:text-white-400"
+                        class="mx-2 text-white-600 transition-colors duration-300 dark:text-white-300 hover:text-white-500 dark:hover:text-white-400"
                         aria-label="Twitter">
                         <i class="fa-brands fa-square-x-twitter"></i>
                     </a>
 
                     <a href="#"
-                        class="mx-2 text-red-600 transition-colors duration-300 dark:text-red-300 hover:text-white-500 dark:hover:text-white-400"
+                        class="mx-2 text-white-600 transition-colors duration-300 dark:text-white-300 hover:text-white-500 dark:hover:text-white-400"
                         aria-label="Facebook">
                         <i class="fa-brands fa-facebook"></i>
                     </a>
 
                     <a href="#"
-                        class="mx-2 text-red-600 transition-colors duration-300 dark:text-red-300 hover:text-white-500 dark:hover:text-white-400"
+                        class="mx-2 text-white-600 transition-colors duration-300 dark:text-white-300 hover:text-white-500 dark:hover:text-white-400"
                         aria-label="Linkedin">
                         <i class="fa-brands fa-linkedin"></i>
 

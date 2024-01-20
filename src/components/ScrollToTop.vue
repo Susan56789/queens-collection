@@ -1,9 +1,6 @@
 <template>
     <button @click="scrollToTop" v-show="isVisible" class="scroll-to-top">
-        <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            viewBox="0 0 24 24">
-            <path d="M19 14l-7-7-7 7"></path>
-        </svg>
+        <i class="fas fa-arrow-up"></i>
     </button>
 </template>
 
@@ -40,9 +37,9 @@ export default {
     position: fixed;
     bottom: 20px;
     right: 20px;
-    background-color: #860f0f;
+    background-color: #fff;
 
-    color: #ffffff;
+    color: #860f0f;
 
     border: none;
     border-radius: 50%;
@@ -52,7 +49,8 @@ export default {
 }
 
 .scroll-to-top:hover {
-    background-color: #9b1919;
+    background-color: #e66363;
+    color: #fff;
 
 }
 </style>
