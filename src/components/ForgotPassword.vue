@@ -10,8 +10,8 @@
             <form id="changePasswordForm" class="space-y-6">
                 <div>
                     <label for="currentPassword" class="text-sm font-medium text-gray-700 block mb-2">Email *</label>
-                    <input type="password" id="currentPassword"
-                        class="password-input form-input block w-full border border-gray-300 rounded-md shadow-sm" required>
+                    <input type="email" id="currentEmail"
+                        class="email-input form-input block w-full border border-gray-300 rounded-md shadow-sm" required>
                 </div>
                 <div>
                     <label for="newPassword" class="text-sm font-medium text-gray-700 block mb-2">New Password *</label>
@@ -27,7 +27,9 @@
                         class="text-xs text-red-600 hover:underline mt-1">Clear</button>
                 </div>
                 <div id="passwordCriteria" class="text-sm space-y-2">
-                    <p class="text-red-500">Weak password. Must contain:</p>
+                    <p class="text-red-500">
+                        <Pic></Pic>Password Must contain:
+                    </p>
                     <ul class="list-disc pl-5 space-y-1">
                         <li>At least 1 uppercase</li>
                         <li>At least 1 number</li>
@@ -35,10 +37,12 @@
                     </ul>
                 </div>
                 <div class="flex justify-between">
-                    <button type="button" onclick="discardChanges()"
-                        class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 focus:outline-none focus:ring focus:border-red-300">Discard</button>
-                    <button type="submit"
-                        class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring focus:border-red-300">Apply
+                    <a href="/sign-up" type="button" class="px-4 py-2 text-sm font-medium text-gray-700 
+                        bg-gray-200 rounded-md hover:bg-gray-300 focus:outline-none 
+                        focus:ring focus:border-red-300">Sign Up?</a>
+                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white
+                         bg-red-600 rounded-md hover:bg-red-700 focus:outline-none
+                          focus:ring focus:border-red-300">Apply
                         Changes</button>
                 </div>
             </form>

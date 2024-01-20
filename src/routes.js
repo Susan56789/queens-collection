@@ -64,7 +64,15 @@ const routes = [
                 component: () => import('./components/ThankyouPage/index.vue')
             },
             {
-                path: '/:pathMatch(.*)*', // 
+                path: '/product/:id',
+                component: () => import('./components/SingleProduct/index.vue')
+            },
+            {
+                path: '/category/:id',
+                component: () => import('./components/SelectedCategory/index.vue')
+            },
+            {
+                path: '/:pathMatch(.*)*',
                 component: () => import('./components/404Page.vue')
             }
         ]

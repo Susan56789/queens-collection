@@ -36,14 +36,24 @@
                             </span>
                         </span>
                     </router-link>
-                    <!-- Sign In / Register      -->
-                    <router-link class="flex items-center hover:text-white-200" to="#">
+                    <!-- Sign In / Register Section -->
+                    <router-link v-if="!isLoggedIn" class="flex items-center hover:text-white-200" to="/login">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hover:text-white-200" fill="none"
                             viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                     </router-link>
+                    <router-link v-else class="flex items-center hover:text-white-200" to="/user-account">
+                        <!-- Link to user account page -->
+                        <!-- You may want to customize the icon or text based on user information -->
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hover:text-white-200" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <!-- Replace with appropriate user icon or text -->
+                            <circle cx="12" cy="12" r="10" />
+                        </svg>
+                    </router-link>
+
 
 
                 </div>
@@ -58,8 +68,8 @@
             </a>
 
             <!-- Responsive Nav Links -->
-            <ul v-if="isNavOpen"
-                class="xl:hidden fixed left-0 top-16 flex flex-col items-start bg-grey-900 text-black w-full shadow-xl">
+            <ul v-if="isNavOpen" class="xl:hidden fixed mt-50 ml-50 
+                flex flex-col items-start bg-grey-900 text-black w-full shadow-xl">
                 <li><router-link class="hover:text-white-200 py-2 px-4" to="/">Home</router-link></li>
                 <li><router-link class="hover:text-white-200 py-2 px-4" to="/about">About Us</router-link></li>
                 <li><router-link class="hover:text-white-200 py-2 px-4" to="/contact">Contact Us</router-link></li>
@@ -71,6 +81,8 @@
 </template>
 
 <script>
+import { mapGetters, mapActions } from 'vuex';
+
 export default {
     name: 'NavBar',
     data() {
@@ -82,6 +94,10 @@ export default {
         toggleNavbar() {
             this.isNavOpen = !this.isNavOpen;
         },
+        ...mapActions(['login', 'logout']),
+    },
+    computed: {
+        ...mapGetters(['isLoggedIn']),
     },
 }
 </script>
