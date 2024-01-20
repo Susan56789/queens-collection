@@ -44,9 +44,14 @@ const routes = [
                 component: () => import('./components/NewUser.vue')
             },
             {
+                path: '/admin',
+                component: () => import('./components/AdminDashboard/AdminLogin.vue')
+            },
+            {
                 path: '/user-account',
                 component: () => import('./components/UserPage/index.vue')
             },
+
             {
                 path: '/privacy-policy',
                 component: () => import('./components/PrivacyPolicy.vue')
@@ -81,6 +86,16 @@ const routes = [
             }
         ]
 
+    },
+    {
+        path: '/adminpage',
+        component: () => import('./components/AdminDashboard/index.vue'),
+        children: [
+            {
+                path: '',
+                component: () => import('./components/AdminDashboard/SummaryPage.vue')
+            }
+        ]
     }
 ]
 
