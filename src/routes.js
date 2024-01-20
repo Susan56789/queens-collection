@@ -44,6 +44,10 @@ const routes = [
                 component: () => import('./components/NewUser.vue')
             },
             {
+                path: '/user-account',
+                component: () => import('./components/UserPage/index.vue')
+            },
+            {
                 path: '/privacy-policy',
                 component: () => import('./components/PrivacyPolicy.vue')
             },
