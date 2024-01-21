@@ -94,6 +94,10 @@ const routes = [
             {
                 path: '',
                 component: () => import('./components/AdminDashboard/SummaryPage.vue')
+            },
+            {
+                path: '/orderpage',
+                component: () => import('./components/AdminDashboard/OrdersPage.vue')
             }
         ]
     }
