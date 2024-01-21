@@ -1,0 +1,4 @@
+User-agent: *
+Disallow:
+
+Sitemap: https://queenscollection.vercel.app/sitemap.xml
