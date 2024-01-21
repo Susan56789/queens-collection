@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
+    "build": "vue-cli-service build && node src/generateSitemap.js",
     "lint": "vue-cli-service lint",
     "build:css": "tailwindcss build src/assets/css/tailwind.css -o public/css/tailwind.css"
   },
@@ -14,6 +14,7 @@
     "core-js": "^3.8.3",
     "express": "^4.18.2",
     "pg": "^8.11.3",
+    "sitemap-generator": "^8.5.1",
     "tailwindcss": "^3.4.1",
     "vue": "^3.2.13",
     "vue-router": "^4.2.5",
