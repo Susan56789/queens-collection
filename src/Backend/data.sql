@@ -34,10 +34,10 @@ CREATE TABLE products (
 );
 
 INSERT INTO products (product_name, price, sale_price, image_path, color, product_size, description, category_id) VALUES
-    ('Backpacks 1060', 1700, 1650, '/images/yellow.jpg', 'Yellow', 'Large', 'Back support with breathable mesh and integrated air-flow channels for increased comfort', 6),
+    ('Backpacks 1060', 1700, 1650, '/images/yellowbag.jpg', 'Yellow', 'Large', 'Back support with breathable mesh and integrated air-flow channels for increased comfort', 6),
 	('Pyjamas Girls 054',1400,00,'/images/pinkpyjamas.jpg','Pink','7-14 yrs','Crafted from lightweight breathable jersey.',8);
 
-SELECT * FROM products;
+SELECT * FROM products WHERE category_id=4;
 
 CREATE TABLE customers (
     customer_id SERIAL PRIMARY KEY,
