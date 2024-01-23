@@ -1,38 +1,38 @@
 <template>
-    <div class="flex flex-col md:flex-row w-screen h-full px-14 py-7">
+    <div class="min-h-screen " v-if="cartData && cartData.products && cartData.products.length > 0">
 
-        <div class="w-full flex flex-col h-fit gap-4 p-4 ">
-            <p class="text-red-900 text-xl font-extrabold">My cart</p>
-            <div v-if="cartData && cartData.products && cartData.products.length > 0">
+        <div class="flex flex-col md:flex-row w-screen h-full px-14 py-7">
+
+            <!-- My Cart -->
+            <div class="w-full flex flex-col h-fit gap-4 p-4 ">
+                <p class="text-red-900 text-xl font-extrabold">My cart</p>
+
                 <!-- Product -->
-
-                <div v-for="product in cartData.products" :key="product.product_id"
-                    class="flex flex-col p-4 text-lg font-semibold shadow-md border rounded-sm">
+                <div class="flex flex-col p-4 text-lg font-semibold shadow-md border rounded-sm">
                     <div class="flex flex-col md:flex-row gap-3 justify-between">
                         <!-- Product Information -->
                         <div class="flex flex-row gap-6 items-center">
                             <div class="w-28 h-28">
-                                <img class="w-full h-full" :src="product.image_path">
+                                <img class="w-full h-full"
+                                    src="https://static.netshoes.com.br/produtos/tenis-adidas-coreracer-masculino/09/NQQ-4635-309/NQQ-4635-309_zoom1.jpg?ts=1675445414&ims=544x">
                             </div>
                             <div class="flex flex-col gap-1">
-                                <p class="text-lg text-gray-800 font-semibold">{{ product.product_name }}</p>
-                                <p class="text-xs text-gray-600 font-semibold">Color: <span class="font-normal">{{
-                                    product.color
-                                }}</span></p>
-                                <p class="text-xs text-gray-600 font-semibold">Size: <span class="font-normal">{{
-                                    product.size
-                                }}</span></p>
+                                <p class="text-lg text-gray-800 font-semibold">Adidas Coreracer Men's Shoes</p>
+                                <p class="text-xs text-gray-600 font-semibold">Color: <span class="font-normal">Black +
+                                        Zinc</span></p>
+                                <p class="text-xs text-gray-600 font-semibold">Size: <span class="font-normal">42</span></p>
                             </div>
                         </div>
                         <!-- Price Information -->
                         <div class="self-center text-center">
-                            <p class="text-gray-600 font-normal text-sm line-through">{{ product.price }} <span
-                                    class="text-emerald-500 ml-2">(-{{ product.discount }}% OFF)</span></p>
-                            <p class="text-gray-800 font-normal text-xl">{{ product.sale_price }}</p>
+                            <p class="text-gray-600 font-normal text-sm line-through">$99.99
+                                <span class="text-emerald-500 ml-2">(-50% OFF)</span>
+                            </p>
+                            <p class="text-gray-800 font-normal text-xl">$49.99</p>
                         </div>
                         <!-- Remove Product Icon -->
                         <div class="self-center">
-                            <button @click="removeProduct(product.product_id)">
+                            <button class="">
                                 <svg class="" height="24px" width="24px" id="Layer_1"
                                     style="enable-background:new 0 0 512 512;" version="1.1" viewBox="0 0 512 512"
                                     xml:space="preserve" xmlns="http://www.w3.org/2000/svg"
@@ -70,22 +70,20 @@
                 </div>
             </div>
 
-
-
             <!-- Purchase Resume -->
-            <div v-if="cartData" class="flex flex-col w-full md:w-2/3 h-fit gap-4 p-4">
+            <div class="flex flex-col w-full md:w-2/3 h-fit gap-4 p-4">
                 <p class="text-red-900 text-xl font-extrabold">Purchase Summary</p>
                 <div class="flex flex-col p-4 gap-4 text-lg font-semibold shadow-md border rounded-sm">
                     <div class="flex flex-row justify-between">
-                        <p class="text-gray-600">Subtotal ({{ cartData.totalItems }} Items)</p>
-                        <p class="text-end font-bold">${{ cartData.subtotal }}</p>
+                        <p class="text-gray-600">Subtotal (2 Items)</p>
+                        <p class="text-end font-bold">$99.98</p>
                     </div>
                     <hr class="bg-gray-200 h-0.5">
                     <div class="flex flex-row justify-between">
-                        <p class="text-gray-600">Shipping Fee</p>
+                        <p class="text-gray-600">Freight</p>
                         <div>
-                            <p class="text-end font-bold">${{ cartData.shippingFee }}</p>
-                            <p class="text-gray-600 text-sm font-normal">{{ cartData.shippingDate }}</p>
+                            <p class="text-end font-bold">$3.90</p>
+                            <p class="text-gray-600 text-sm font-normal">Arrives on Jul 16</p>
                         </div>
                     </div>
                     <hr class="bg-gray-200 h-0.5">
@@ -97,27 +95,27 @@
                     <div class="flex flex-row justify-between">
                         <p class="text-gray-600">Total</p>
                         <div>
-                            <p class="text-end font-bold">${{ calculateTotal() }}</p>
+                            <p class="text-end font-bold">$103.88</p>
                         </div>
                     </div>
                     <div class="flex gap-2">
                         <button
                             class="transition-colors text-sm bg-red-600 hover:bg-red-700 p-2 rounded-sm w-full text-white text-hover shadow-md">
-                            FINISH
+                            CHECKOUT
                         </button>
                         <button
                             class="transition-colors text-sm bg-white border border-gray-600 p-2 rounded-sm w-full text-gray-700 text-hover shadow-md">
-                            ADD MORE PRODUCTS
+                            CONTINUE SHOPPING
                         </button>
                     </div>
                 </div>
-
-            </div>
-            <div v-else>
-                <p class="text-gray-600">Your cart is empty.</p>
             </div>
         </div>
 
+
+    </div>
+    <div v-else>
+        <p class="text-gray-600">Your cart is empty.</p>
     </div>
 </template>
 
@@ -150,7 +148,7 @@ export default {
             try {
                 // Replace 'YOUR_BACKEND_API_ENDPOINT' with the actual endpoint
                 const response = await axios.get('http://localhost:3000/api/allCartItems');
-
+                console.log("Cart Data:", response)
                 // Assuming the response contains cart data in the 'data' property
                 this.cartData = response.data;
             } catch (error) {
