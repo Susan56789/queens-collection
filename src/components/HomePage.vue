@@ -81,7 +81,14 @@
                         </div>
                         <div class="px-5 py-3">
                             <h3 class="text-gray-700 uppercase">{{ product.product_name }}</h3>
-                            <span class="text-gray-500 mt-2">{{ formatNumber(product.price) }}</span>
+                            <p class="text-gray-500 mt-2">
+                                <span v-if="product.sale_price && product.sale_price > 0">
+                                    {{ formatCurrency(product.sale_price) }}
+                                </span>
+                                <span v-else>
+                                    {{ formatCurrency(product.price) }}
+                                </span>
+                            </p>
                         </div>
                     </div>
 
@@ -97,7 +104,7 @@
                             :style="{ backgroundImage: 'url(' + product.image_path + ')' }">
                             <button v-if="product.amountSaved > 0" class="save-button absolute top-0 right-0 bg-green-500 
                 text-white p-2 duration-100 hover:bg-green-700 rounded-full">
-                                SAVE<br />{{ formatNumber(product.amountSaved) }}
+                                SAVE<br />{{ formatCurrency(product.amountSaved) }}
                             </button>
                             <button
                                 class="p-2 rounded-full bg-red-600 text-white mx-5 -mb-4 hover:bg-red-500 focus:outline-none focus:bg-red-500">
@@ -111,7 +118,14 @@
                         </div>
                         <div class="px-5 py-3">
                             <h3 class="text-gray-700 uppercase">{{ product.product_name }}</h3>
-                            <span class="text-gray-500 mt-2">KES. {{ formatNumber(product.sale_price) }}</span>
+                            <p class="text-gray-500 mt-2">
+                                <span v-if="product.sale_price && product.sale_price > 0">
+                                    {{ formatCurrency(product.sale_price) }}
+                                </span>
+                                <span v-else>
+                                    {{ formatCurrency(product.price) }}
+                                </span>
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -162,8 +176,9 @@ export default {
             });
         },
 
-        formatNumber(value) {
-            return value.toLocaleString();
+        formatCurrency(value) {
+            const numericValue = parseFloat(value);
+            return isNaN(numericValue) ? '-' : numericValue.toLocaleString('en-KE', { style: 'currency', currency: 'KES' });
         },
 
     },
@@ -191,12 +206,14 @@ export default {
 .save-button {
 
     background-color: #eb2222;
-
     color: #fff;
-
     padding: 0.5rem;
-
+    font-weight: bold;
+    text-align: center;
+    font-size: x-small;
     border-radius: 80%;
+    width: 50px;
+    height: 50px;
 
 }
 </style>

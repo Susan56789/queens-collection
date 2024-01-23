@@ -32,7 +32,15 @@
                             <h4 class="mt-2 text-lg font-medium text-black-700 dark:text-black-200">
                                 {{ product.product_name }}
                             </h4>
-                            <p class="text-red-500">{{ `KES.${product.price}` }}</p>
+                            <p class="text-red-500">
+                                <span v-if="product.sale_price && product.sale_price > 0">
+                                    {{ formatCurrency(product.sale_price) }}
+                                </span>
+                                <span v-else>
+                                    {{ formatCurrency(product.price) }}
+                                </span>
+                            </p>
+
                             <button
                                 class="flex items-center justify-center w-full px-2 py-2 mt-4 font-medium tracking-wide text-white capitalize transition-colors duration-200 transform bg-black-800 rounded-md hover:bg-black-700 focus:outline-none focus:bg-black-700"
                                 @click="addToCart(product)">
@@ -79,6 +87,10 @@ export default {
     },
 
     methods: {
+        formatCurrency(value) {
+            const numericValue = parseFloat(value);
+            return isNaN(numericValue) ? '-' : numericValue.toLocaleString('en-KE', { style: 'currency', currency: 'KES' });
+        },
         async selectCategory(categoryId) {
 
             this.selectedCategory = categoryId;
