@@ -83,7 +83,8 @@ const routes = [
             {
                 path: '/:pathMatch(.*)*',
                 component: () => import('./components/404Page.vue')
-            }
+            },
+
         ]
 
     },
@@ -98,6 +99,10 @@ const routes = [
             {
                 path: '/orderpage',
                 component: () => import('./components/AdminDashboard/OrdersPage.vue')
+            },
+            {
+                path: '/newproduct',
+                component: () => import('./components/AdminDashboard/AddProducts.vue')
             }
         ]
     }

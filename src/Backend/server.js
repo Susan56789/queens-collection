@@ -2,14 +2,14 @@ const express = require('express');
 const { Client } = require('pg');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-// const apiRoutes = require('./apiRoutes');
+const dotenv = require('dotenv')
+
+dotenv.config();
+
 const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
-
-// app.use('/api', apiRoutes);
-
 
 const client = new Client({
     user: 'postgres',
@@ -30,6 +30,7 @@ client.connect((err) => {
     console.log('Connected to POSTGRESQL database');
 
 });
+
 
 //ROUTES
 app.get('/api/products', async (req, res) => {
@@ -79,6 +80,43 @@ app.get('/api/productsByCategory', async (req, res) => {
     }
 });
 
+
+// Endpoint to add a new product
+app.post('/api/products', async (req, res) => {
+    try {
+        const {
+            product_name,
+            price,
+            sale_price,
+            image_path,
+            color,
+            product_size,
+            description,
+            category_id,
+        } = req.body;
+
+        const result = await client.query(
+            'INSERT INTO products (product_name, price, sale_price, image_path, color, product_size, description, category_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
+            [product_name, price, sale_price, image_path, color, product_size, description, category_id]
+        );
+
+        res.json(result.rows[0]);
+    } catch (error) {
+        console.error('Error adding product', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+// Endpoint to get the latest 10 products
+app.get('/api/products/latest', async (req, res) => {
+    try {
+        const result = await client.query('SELECT * FROM products ORDER BY product_id DESC LIMIT 10');
+        res.json(result.rows);
+    } catch (error) {
+        console.error('Error fetching latest products', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
 
 
 app.listen(port, () => {

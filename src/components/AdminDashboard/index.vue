@@ -82,7 +82,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="#"
+                        <a href="/newproduct"
                             class="relative flex flex-row items-center h-11 focus:outline-none hover:hover:bg-gray-600 text-white-600 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 hover:border-gray-800 pr-6">
                             <span class="inline-flex justify-center items-center ml-4">
                                 <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
