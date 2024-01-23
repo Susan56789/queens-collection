@@ -3,64 +3,75 @@
         <div class="flex items-center justify-center p-12">
             <div class="mx-auto w-full max-w-[550px]">
                 <form @submit.prevent="addProduct">
-                    <label class="mb-3 block text-base font-medium text-[#07074D]">
+                    <label class="mb-3 block text-base font-medium text-red-500">
                         Product Name:
                         <input
-                            class="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                            class="w-full rounded-md border border-red-500 bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-red-500 focus:shadow-md"
                             v-model="product.product_name" type="text" required />
                     </label>
 
-                    <label class="mb-3 block text-base font-medium text-[#07074D]">
+                    <label class="mb-3 block text-base font-medium text-red-500">
                         Price:
                         <input
-                            class="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                            class="w-full rounded-md border border-red-500 bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-red-500 focus:shadow-md"
                             v-model.number="product.price" type="number" step="0.01" required />
                     </label>
 
-                    <label class="mb-3 block text-base font-medium text-[#07074D]">
+                    <label class="mb-3 block text-base font-medium text-red-500">
                         Sale Price:
                         <input
-                            class="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                            class="w-full rounded-md border border-red-500 bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-red-500 focus:shadow-md"
                             v-model.number="product.sale_price" type="number" step="0.01" />
                     </label>
 
-                    <label class="mb-3 block text-base font-medium text-[#07074D]">
+                    <label class="mb-3 block text-base font-medium text-red-500">
                         Image Path:
                         <input
-                            class="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                            class="w-full rounded-md border border-red-500 bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-red-500 focus:shadow-md"
                             v-model="product.image_path" type="text" />
                     </label>
 
-                    <label class="mb-3 block text-base font-medium text-[#07074D]">
+                    <label class="mb-3 block text-base font-medium text-red-500">
                         Color:
                         <input
-                            class="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                            class="w-full rounded-md border border-red-500 bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-red-500 focus:shadow-md"
                             v-model="product.color" type="text" />
                     </label>
 
-                    <label class="mb-3 block text-base font-medium text-[#07074D]">
+                    <label class="mb-3 block text-base font-medium text-red-500">
                         Product Size:
                         <input
-                            class="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                            class="w-full rounded-md border border-red-500 bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-red-500 focus:shadow-md"
                             v-model="product.product_size" type="text" />
                     </label>
 
-                    <label class="mb-3 block text-base font-medium text-[#07074D]">
-                        Description:
+                    <label class="mb-3 block text-base font-medium text-red-500">
+                        Short Description:
                         <textarea
-                            class="w-full resize-none rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                            class="w-full resize-none rounded-md border border-red-500 bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-red-500 focus:shadow-md"
                             v-model="product.description"></textarea>
                     </label>
 
-                    <label class="mb-3 block text-base font-medium text-[#07074D]">
+                    <label class="mb-3 block text-base font-medium text-red-500">
                         Category ID:
                         <input
-                            class="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                            class="w-full rounded-md border border-red-500 bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-red-500 focus:shadow-md"
                             v-model.number="product.category_id" type="number" required />
                     </label>
-
+                    <label class="mb-3 block text-base font-medium text-red-500">
+                        Category Name:
+                        <select class="w-full rounded-md border border-red-500 bg-white py-3 px-6 text-base font-medium
+                             text-[#6B7280] outline-none focus:border-red-500 focus:shadow-md"
+                            v-model="product.category_id" required>
+                            <option value="" disabled>Select a category</option>
+                            <option v-for="category in categories" :key="category.category_id"
+                                :value="category.category_id">
+                                {{ category.category_name }}
+                            </option>
+                        </select>
+                    </label>
                     <button
-                        class="hover:shadow-form rounded-md bg-[#6A64F1] py-3 px-8 text-base font-semibold text-white outline-none"
+                        class="hover:shadow-form rounded-md bg-red-500 py-3 px-8 text-base font-semibold text-white outline-none"
                         type="submit">Add Product</button>
                 </form>
             </div>
@@ -137,31 +148,53 @@ export default {
         return {
             product: {
                 product_name: "",
-                price: 0,
-                sale_price: 0,
+                price: null,
+                sale_price: null,
                 image_path: "",
                 color: "",
                 product_size: "",
                 description: "",
-                category_id: 1,
+                category_id: null,
             },
             latestProducts: [],
+            categories: [],
         };
     },
     mounted() {
         this.fetchLatestProducts();
+        this.fetchCategories();
     },
     methods: {
         formatCurrency(value) {
             const numericValue = parseFloat(value);
             return isNaN(numericValue) ? '-' : numericValue.toLocaleString('en-KE', { style: 'currency', currency: 'KES' });
         },
-
+        async fetchCategories() {
+            try {
+                // Make an API request to fetch categories
+                const response = await this.$axios.get('http://localhost:3000/api/categories');
+                this.categories = response.data;
+            } catch (error) {
+                console.error('Error fetching categories', error);
+            }
+        },
         addProduct() {
             this.$axios.post("http://localhost:3000/api/products", this.product)
                 .then(response => {
                     console.log("Product added successfully", response.data);
                     this.fetchLatestProducts();
+                    // Reset the form data after successful submission
+                    this.product = {
+                        product_name: "",
+                        price: null,
+                        sale_price: null,
+                        image_path: "",
+                        color: "",
+                        product_size: "",
+                        description: "",
+                        category_id: null,
+
+                    };
                 })
                 .catch(error => {
                     console.error("Error adding product", error);

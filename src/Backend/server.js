@@ -80,7 +80,6 @@ app.get('/api/productsByCategory', async (req, res) => {
     }
 });
 
-
 // Endpoint to add a new product
 app.post('/api/products', async (req, res) => {
     try {

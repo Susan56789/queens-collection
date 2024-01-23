@@ -65,7 +65,7 @@
             <div class="mt-16">
                 <h3 class="text-gray-600 text-2xl font-medium">New Arrivals</h3>
                 <div class="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mt-6">
-                    <div v-for="product  in allProducts.slice(0, 8)" :key="product.product_id"
+                    <div v-for="product  in allProducts" :key="product.product_id"
                         class="w-full max-w-sm mx-auto rounded-md shadow-md overflow-hidden">
                         <div class="flex items-end justify-end h-56 w-full bg-cover"
                             :style="{ backgroundImage: 'url(' + product.image_path + ')' }">
@@ -91,7 +91,7 @@
             <div class="mt-16">
                 <h3 class="text-gray-600 text-2xl font-medium">Today's Offer</h3>
                 <div class="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mt-6">
-                    <div v-for="product  in productsOnSale.slice(0, 8)" :key="product.product_id"
+                    <div v-for="product  in productsOnSale" :key="product.product_id"
                         class="w-full max-w-sm mx-auto rounded-md shadow-md overflow-hidden relative">
                         <div class="flex items-end justify-end h-56 w-full bg-cover"
                             :style="{ backgroundImage: 'url(' + product.image_path + ')' }">
@@ -135,13 +135,20 @@ export default {
         async fetchProducts() {
             try {
                 const response = await axios.get('http://localhost:3000/api/products');
-                this.products = response.data || [];
+                const products = response.data || [];
+
+                // Assuming products have a product_id field
+                const sortedProducts = [...products].sort((a, b) => b.product_id - a.product_id);
+
+                // Update this.products with the fetched and sorted products
+                this.products = sortedProducts;
+
+                // Calculate amount saved for each product
                 this.calculateAmountSavedForEachProduct();
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
         },
-
         calculateAmountSavedForEachProduct() {
             this.products.forEach((product) => {
                 const numericPrice = Number(product.price);
@@ -158,15 +165,20 @@ export default {
         formatNumber(value) {
             return value.toLocaleString();
         },
+
     },
     computed: {
         productsOnSale() {
             return this.products.filter((product) => product.price > product.sale_price && product.sale_price > 0);
         },
-        allProducts() {
-            return this.products.filter((product) => product)
-        }
 
+        allProducts() {
+
+            const sortedProducts = [...this.products].sort((a, b) => b.product_id - a.product_id);
+
+
+            return sortedProducts.slice(0, 8);
+        },
     },
     mounted() {
         this.fetchProducts();
