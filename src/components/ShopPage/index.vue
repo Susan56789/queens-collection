@@ -43,7 +43,7 @@
 
                             <button
                                 class="flex items-center justify-center w-full px-2 py-2 mt-4 font-medium tracking-wide text-white capitalize transition-colors duration-200 transform bg-black-800 rounded-md hover:bg-black-700 focus:outline-none focus:bg-black-700"
-                                @click="addToCart(product)">
+                                @click="addToCartButton(product)">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mx-1" viewBox="0 0 20 20"
                                     fill="currentColor">
                                     <path
@@ -87,6 +87,28 @@ export default {
     },
 
     methods: {
+        addToCartButton(product) {
+
+            this.selectedProduct = product;
+            this.addToCart();
+        },
+        addToCart() {
+
+            const product = this.selectedProduct;
+
+            if (product && product.product_id && product.price) {
+                axios.post('http://localhost:3000/api/addToCart', product)
+                    .then(response => {
+                        console.log(response.data);
+                    })
+                    .catch(error => {
+                        console.error(error);
+                    });
+            } else {
+                console.error('Invalid product data for cart:', product);
+            }
+        },
+
         formatCurrency(value) {
             const numericValue = parseFloat(value);
             return isNaN(numericValue) ? '-' : numericValue.toLocaleString('en-KE', { style: 'currency', currency: 'KES' });
@@ -116,10 +138,7 @@ export default {
                 console.error('Error fetching products', error);
             }
         },
-        addToCart(product) {
 
-            console.log('Added to cart:', product);
-        },
     },
 
 };

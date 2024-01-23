@@ -63,9 +63,15 @@ CREATE TABLE cart (
     cart_id SERIAL PRIMARY KEY,
     customer_id INT REFERENCES customers(customer_id),
     product_id INT REFERENCES products(product_id),
+	product_name VARCHAR(255),
+    price NUMERIC,
+	sale_price NUMERIC,
+	image_path VARCHAR(255),
     quantity INT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+SELECT * FROM cart;
 
 CREATE TABLE orders (
     order_id SERIAL PRIMARY KEY,

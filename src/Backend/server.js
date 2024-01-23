@@ -118,6 +118,36 @@ app.get('/api/products/latest', async (req, res) => {
     }
 });
 
+app.post('/api/addToCart', (req, res) => {
+    const product = req.body;
+
+    const { product_name, product_id, customer_id, image_path, quantity, sale_price, price } = product;
+
+    const sql = 'INSERT INTO cart (product_name, product_id, customer_id, image_path, quantity, sale_price, price) VALUES ($1, $2, $3, $4, $5, $6, $7)';
+
+    client.query(sql, [product_name, product_id, customer_id, image_path, quantity, sale_price, price], (error, results) => {
+        if (error) {
+            console.error(error);
+            res.status(500).json({ error: 'Internal Server Error' });
+        } else {
+            res.status(200).json({ success: true, message: 'Product added to cart' });
+        }
+    });
+});
+
+
+app.get('/api/allCartItems', async (req, res) => {
+
+    try {
+        const result = await client.query('SELECT * FROM cart');
+
+        res.json(result.rows);
+    } catch (error) {
+        console.error('Error fetching latest products', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
 
 app.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`);
