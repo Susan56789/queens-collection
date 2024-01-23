@@ -34,7 +34,7 @@ CREATE TABLE products (
 );
 
 
-
+SELECT * FROM products ORDER BY product_id DESC LIMIT 10;
 INSERT INTO products (product_name, price, sale_price, image_path, color, product_size, description, category_id) VALUES
     ('Jumper Suits 2pcs Set ', 4000, 00, '/images/purplejumpersuit.jpg',
 	 'Purple', 'Small,Medium,Large', 'Colors: Apple Green, Brown, DK. Purple, Green, LT Pink, Peach, Sky Blue', 11),
