@@ -82,6 +82,10 @@
                         <tr>
                             <th
                                 class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                Image
+                            </th>
+                            <th
+                                class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                 Product Name
                             </th>
                             <th
@@ -92,20 +96,31 @@
                                 class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                 Sale Price
                             </th>
+                            <th
+                                class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr v-for="product in latestProducts" :key="product.product_id">
-                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                            <td class="px-5 py-5 border-b border-gray-200  text-sm">
+                                <img :src="product.image_path" :alt="product.product_name" />
+                            </td>
+                            <td class="px-5 py-5 border-b border-gray-200  text-sm">
                                 {{ product.product_name }}
                             </td>
-                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                {{ product.price }}
+                            <td class="px-5 py-5 border-b border-gray-200  text-sm">
+                                {{ formatCurrency(product.price) }}
                             </td>
-                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                {{ product.sale_price }}
+                            <td class="px-5 py-5 border-b border-gray-200  text-sm">
+                                {{ formatCurrency(product.sale_price) }}
+                            </td>
+                            <td class="px-5 py-5 border-b border-gray-200  text-sm">
+                                <a href="#" class="hover:red">View</a>
                             </td>
                         </tr>
+
                     </tbody>
                 </table>
             </div>
@@ -137,8 +152,13 @@ export default {
         this.fetchLatestProducts();
     },
     methods: {
+        formatCurrency(value) {
+            const numericValue = parseFloat(value);
+            return isNaN(numericValue) ? '-' : numericValue.toLocaleString('en-KE', { style: 'currency', currency: 'KES' });
+        },
+
         addProduct() {
-            this.$axios.post("/api/products", this.product)
+            this.$axios.post("http://localhost:3000/api/products", this.product)
                 .then(response => {
                     console.log("Product added successfully", response.data);
                     this.fetchLatestProducts();
@@ -149,7 +169,8 @@ export default {
         },
         async fetchLatestProducts() {
             try {
-                const response = await axios.get("/api/products/latest");
+                const response = await axios.get("http://localhost:3000/api/products/latest");
+
                 this.latestProducts = response.data || [];
 
             } catch (error) {
@@ -160,3 +181,10 @@ export default {
 };
 </script>
   
+
+<style scoped>
+img {
+    width: 50px;
+    height: 50px;
+}
+</style>

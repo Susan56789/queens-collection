@@ -111,6 +111,7 @@ app.post('/api/products', async (req, res) => {
 app.get('/api/products/latest', async (req, res) => {
     try {
         const result = await client.query('SELECT * FROM products ORDER BY product_id DESC LIMIT 10');
+
         res.json(result.rows);
     } catch (error) {
         console.error('Error fetching latest products', error);
