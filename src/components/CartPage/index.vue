@@ -8,7 +8,7 @@
                 <p class="text-red-900 text-xl font-extrabold">My cart</p>
 
                 <!-- Product -->
-                <div v-for="product in cartData" :key="product.product_id"
+                <div v-for="(product, index) in cartData" :key="index"
                     class="flex flex-col p-4 text-lg font-semibold shadow-md border rounded-sm">
                     <div class="flex flex-col md:flex-row gap-3 justify-between">
                         <!-- Product Information -->
@@ -18,9 +18,7 @@
                             </div>
                             <div class="flex flex-col gap-1">
                                 <p class="text-lg text-gray-800 font-semibold">{{ product.product_name }}</p>
-                                <!-- <p class="text-xs text-gray-600 font-semibold">Color: <span class="font-normal">Black +
-                                        Zinc</span></p>
-                                <p class="text-xs text-gray-600 font-semibold">Size: <span class="font-normal">42</span></p> -->
+
                             </div>
                         </div>
                         <!-- Price Information -->
@@ -41,7 +39,7 @@
                         </div>
                         <!-- Remove Product Icon -->
                         <div class="self-center">
-                            <button class="">
+                            <button @click="removeItem(index)" class="">
                                 <svg class="" height="24px" width="24px" id="Layer_1"
                                     style="enable-background:new 0 0 512 512;" version="1.1" viewBox="0 0 512 512"
                                     xml:space="preserve" xmlns="http://www.w3.org/2000/svg"
@@ -61,23 +59,37 @@
                     </div>
                     <!-- Product Quantity -->
                     <div class="flex flex-row self-center gap-1">
-                        <button class="w-5 h-5 self-center rounded-full border border-gray-300">
+                        <button @click="decreaseQuantity(index)"
+                            class="w-5 h-5 self-center rounded-full border border-gray-300">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#d1d5db"
                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M5 12h14" />
                             </svg>
                         </button>
-                        <input type="text" readonly="readonly" value="1"
+                        <span type="text"
                             class="w-8 h-8 text-center text-gray-900 text-sm outline-none border border-gray-300 rounded-sm">
-                        <button class="w-5 h-5 self-center rounded-full border border-gray-300">
+                            {{
+                                product.quantity }}
+                        </span>
+                        <button @click="increaseQuantity(index)"
+                            class="w-5 h-5 self-center rounded-full border border-gray-300">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="" stroke="#9ca3af"
                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M12 5v14M5 12h14" />
                             </svg>
                         </button>
                     </div>
+
                 </div>
+                <button @click="updateCart" :class="{
+                    'transition-colors text-sm bg-white border border-gray-600 p-2 rounded-sm w-full text-gray-700 text-hover shadow-md':
+                        isQuantityChanged,
+                    'opacity-50 cursor-not-allowed': !isQuantityChanged
+                }">
+                    UPDATE CART
+                </button>
             </div>
+
 
             <!-- Purchase Resume -->
             <div class="flex flex-col w-full md:w-2/3 h-fit gap-4 p-4">
@@ -92,7 +104,7 @@
                         <p class="text-gray-600">Shipping Fee</p>
                         <div>
                             <p class="text-end font-bold">{{ formatCurrency(shippingFee) }}</p>
-                            <p class="text-gray-600 text-sm font-normal">Arrives on Jul 16</p>
+                            <p class="text-gray-600 text-sm font-normal">Arrives on {{ calculateDeliveryDate() }}</p>
                         </div>
                     </div>
                     <hr class="bg-gray-200 h-0.5">
@@ -108,11 +120,11 @@
                         </div>
                     </div>
                     <div class="flex gap-2">
-                        <button
+                        <button @click="checkout"
                             class="transition-colors text-sm bg-red-600 hover:bg-red-700 p-2 rounded-sm w-full text-white text-hover shadow-md">
                             CHECKOUT
                         </button>
-                        <button
+                        <button @click="returnshop"
                             class="transition-colors text-sm bg-white border border-gray-600 p-2 rounded-sm w-full text-gray-700 text-hover shadow-md">
                             CONTINUE SHOPPING
                         </button>
@@ -124,7 +136,14 @@
 
     </div>
     <div v-else class="text-gray-600 min-h-screen ">
-        <p>Your cart is empty.</p>
+        <div class="grid grid-cols-3 grid-rows-3 place-items-center h-screen">
+            <div class="col-start-2 row-start-2 ">
+                <img src="/images/emptycart.png" />
+                <p>Your cart is empty.</p>
+                <a class="transition-colors text-sm bg-red-600 hover:bg-red-700 p-2 rounded-sm w-full text-white text-hover shadow-md"
+                    href="/shop">Continue Shopping</a>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -134,35 +153,17 @@ export default {
     name: 'CartPage',
     data() {
         return {
-            cartData: null,
+            cartData: [],
             shippingFee: 300,
-            quantity: 1,
+            originalQuantities: []
+
         };
     },
     mounted() {
         this.fetchCartData();
     },
-    methods: {
-        formatCurrency(value) {
-            const numericValue = parseFloat(value);
-            return isNaN(numericValue) ? '-' : numericValue.toLocaleString('en-KE', { style: 'currency', currency: 'KES' });
-        },
-        async fetchCartData() {
-            try {
-                const response = await axios.get('http://localhost:3000/api/allCartItems');
-                this.cartData = response.data;
-
-                console.log('Cart Data:', response.data);
-                return this.cartData;
-            } catch (error) {
-                console.error(error);
-                throw error;
-            }
-        },
-
-    },
-
     computed: {
+
         cartTotalWithoutShipping() {
             if (!this.cartData) {
                 return 0;
@@ -171,11 +172,11 @@ export default {
             // Calculate the total without shipping by summing up the prices of all items in the cart
             return this.cartData.reduce((sum, item) => {
                 if (item.sale_price > 0) {
-                    console.log('quantity', this.quantity)
-                    return sum + (this.quantity * (item.sale_price));
+
+                    return sum + (item.quantity * (item.sale_price));
 
                 }
-                return sum + (this.quantity * (item.price));
+                return sum + (item.quantity * (item.price));
 
             }, 0);
         },
@@ -183,6 +184,103 @@ export default {
             return this.cartTotalWithoutShipping + this.shippingFee;
         },
     },
+    methods: {
+        calculateDeliveryDate() {
+            const currentDate = new Date();
+            const deliveryDate = new Date(currentDate.setDate(currentDate.getDate() + 3));
+
+            // Format the date to your desired format (e.g., "MMM DD")
+            const options = { month: 'short', day: 'numeric' };
+            return deliveryDate.toLocaleDateString('en-US', options);
+        },
+        formatCurrency(value) {
+            const numericValue = parseFloat(value);
+            return isNaN(numericValue) ? '-' : numericValue.toLocaleString('en-KE', { style: 'currency', currency: 'KES' });
+        },
+        async fetchCartData() {
+            try {
+                const response = await axios.get('http://localhost:3000/api/allCartItems');
+                this.cartData = response.data;
+                return this.cartData;
+            } catch (error) {
+                console.error(error);
+                throw error;
+            }
+        },
+        isValidNumber(value) {
+            return typeof value === 'number' && !isNaN(value) && isFinite(value);
+        },
+        increaseQuantity(index) {
+            if (this.isValidIndex(index)) {
+                const product = this.cartData[index];
+                product.quantity++;
+
+
+            } else {
+                console.error('Invalid index.');
+            }
+        },
+
+        decreaseQuantity(index) {
+            if (this.isValidIndex(index)) {
+                const product = this.cartData[index];
+
+                if (product.quantity > 1) {
+                    product.quantity--;
+
+
+                } else {
+                    console.error('Minimum quantity reached.');
+                }
+            } else {
+                console.error('Invalid index.');
+            }
+        },
+
+        removeItem(index) {
+            const itemId = this.cartData[index].product_id;
+
+
+            axios.delete(`http://localhost:3000/api/removeCartItem/${itemId}`)
+                .then(response => {
+                    console.log(response.data);
+
+
+                    this.cartData.splice(index, 1);
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+        },
+
+        isValidIndex(index) {
+            return this.cartData && index >= 0 && index < this.cartData.length;
+        },
+
+        isQuantityChanged(index) {
+            return this.cartData[index].quantity !== this.originalQuantities[index];
+        },
+        async updateCart() {
+            try {
+                const response = await axios.post('http://localhost:3000/api/update-cart', {
+                    cartData: this.cartData,
+                });
+
+                console.log('Quantity updated in the database:', response.data);
+            } catch (error) {
+                console.error('An error occurred while updating the cart:', error.message);
+            }
+        }
+
+    },
+
+
+
+
+
+
+
+
 
 }
 

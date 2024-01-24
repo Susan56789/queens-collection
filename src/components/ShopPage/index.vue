@@ -96,7 +96,7 @@ export default {
 
             const product = this.selectedProduct;
 
-            if (product && product.product_id && product.price) {
+            if (product && product.product_id && product.price && product.quantity) {
                 axios.post('http://localhost:3000/api/addToCart', product)
                     .then(response => {
                         console.log(response.data);

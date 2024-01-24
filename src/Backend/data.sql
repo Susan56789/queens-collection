@@ -42,6 +42,10 @@ INSERT INTO products (product_name, price, sale_price, image_path, color, produc
 	 'Red,Cream Grey,Navy','M,L,XL,2XL','100% Polyester Adult Bathrobes',14)
 	 ;
 
+ALTER TABLE products
+ADD COLUMN quantity INT DEFAULT 1;
+UPDATE products SET quantity = 1;
+
 
 SELECT * FROM products;
 
@@ -80,6 +84,7 @@ CREATE TABLE orders (
     total_amount NUMERIC,
     status VARCHAR(50) DEFAULT 'Pending'
 );
+UPDATE cart SET quantity = 1;
 
 CREATE TABLE order_items (
     order_item_id SERIAL PRIMARY KEY,
