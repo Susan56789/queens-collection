@@ -3,6 +3,7 @@ const { Client } = require('pg');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const dotenv = require('dotenv')
+const bcrypt = require('bcrypt');
 
 dotenv.config();
 
@@ -181,6 +182,45 @@ app.delete('/api/removeCartItem/:itemId', async (req, res) => {
         console.log(result);
 
         res.status(200).send('Item removed from the cart');
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+// User registration
+app.post('/api/register', async (req, res) => {
+    const { email, pswd } = req.body;
+    const hashedpswd = await bcrypt.hash(pswd, 10);
+
+    try {
+        await client.query('INSERT INTO customers (email, pswd) VALUES ($1, $2)', [email, hashedpswd]);
+        res.status(201).send('User registered successfully');
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+// User login
+app.post('/api/login', async (req, res) => {
+    const { email, pswd } = req.body;
+
+    try {
+        const result = await client.query('SELECT * FROM customers WHERE email = $1', [email]);
+
+        if (result.rows.length === 0) {
+            res.status(401).send('Invalid credentials');
+            return;
+        }
+
+        const isValidpswd = await bcrypt.compare(pswd, result.rows[0].pswd);
+
+        if (isValidpswd) {
+            res.status(200).send('Login successful');
+        } else {
+            res.status(401).send('Invalid credentials');
+        }
     } catch (error) {
         console.error(error);
         res.status(500).send('Internal Server Error');
