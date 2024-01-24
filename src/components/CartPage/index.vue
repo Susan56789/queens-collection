@@ -1,5 +1,5 @@
 <template>
-    <div class="min-h-screen " v-if="cartData && cartData.products && cartData.products.length > 0">
+    <div class="min-h-screen " v-if="cartData && cartData.length > 0">
 
         <div class="flex flex-col md:flex-row w-screen h-full px-14 py-7">
 
@@ -8,27 +8,36 @@
                 <p class="text-red-900 text-xl font-extrabold">My cart</p>
 
                 <!-- Product -->
-                <div class="flex flex-col p-4 text-lg font-semibold shadow-md border rounded-sm">
+                <div v-for="product in cartData" :key="product.product_id"
+                    class="flex flex-col p-4 text-lg font-semibold shadow-md border rounded-sm">
                     <div class="flex flex-col md:flex-row gap-3 justify-between">
                         <!-- Product Information -->
                         <div class="flex flex-row gap-6 items-center">
                             <div class="w-28 h-28">
-                                <img class="w-full h-full"
-                                    src="https://static.netshoes.com.br/produtos/tenis-adidas-coreracer-masculino/09/NQQ-4635-309/NQQ-4635-309_zoom1.jpg?ts=1675445414&ims=544x">
+                                <img class="w-full h-full" :src="product.image_path" :alt="product.product_name" />
                             </div>
                             <div class="flex flex-col gap-1">
-                                <p class="text-lg text-gray-800 font-semibold">Adidas Coreracer Men's Shoes</p>
-                                <p class="text-xs text-gray-600 font-semibold">Color: <span class="font-normal">Black +
+                                <p class="text-lg text-gray-800 font-semibold">{{ product.product_name }}</p>
+                                <!-- <p class="text-xs text-gray-600 font-semibold">Color: <span class="font-normal">Black +
                                         Zinc</span></p>
-                                <p class="text-xs text-gray-600 font-semibold">Size: <span class="font-normal">42</span></p>
+                                <p class="text-xs text-gray-600 font-semibold">Size: <span class="font-normal">42</span></p> -->
                             </div>
                         </div>
                         <!-- Price Information -->
                         <div class="self-center text-center">
-                            <p class="text-gray-600 font-normal text-sm line-through">$99.99
-                                <span class="text-emerald-500 ml-2">(-50% OFF)</span>
-                            </p>
-                            <p class="text-gray-800 font-normal text-xl">$49.99</p>
+                            <div v-if="product.sale_price">
+                                <p class="text-gray-600 font-normal text-sm line-through">
+                                    {{ formatCurrency(product.price) }}
+
+                                </p>
+                                <span class="text-emerald-500 ml-2">
+                                    (-{{ ((product.price - product.sale_price) / product.price * 100).toFixed(0) }}% OFF)
+                                </span>
+                            </div>
+                            <!-- Always show the discounted price -->
+                            <p class="text-gray-800 font-normal text-xl">{{ formatCurrency(product.sale_price ?
+                                product.sale_price :
+                                product.price) }}</p>
                         </div>
                         <!-- Remove Product Icon -->
                         <div class="self-center">
@@ -72,17 +81,17 @@
 
             <!-- Purchase Resume -->
             <div class="flex flex-col w-full md:w-2/3 h-fit gap-4 p-4">
-                <p class="text-red-900 text-xl font-extrabold">Purchase Summary</p>
+                <p class="text-red-900 text-xl font-extrabold">Cart Summary</p>
                 <div class="flex flex-col p-4 gap-4 text-lg font-semibold shadow-md border rounded-sm">
                     <div class="flex flex-row justify-between">
-                        <p class="text-gray-600">Subtotal (2 Items)</p>
-                        <p class="text-end font-bold">$99.98</p>
+                        <p class="text-gray-600">Subtotal ({{ cartData.length }} Items)</p>
+                        <p class="text-end font-bold">{{ formatCurrency(cartTotalWithoutShipping) }}</p>
                     </div>
                     <hr class="bg-gray-200 h-0.5">
                     <div class="flex flex-row justify-between">
-                        <p class="text-gray-600">Freight</p>
+                        <p class="text-gray-600">Shipping Fee</p>
                         <div>
-                            <p class="text-end font-bold">$3.90</p>
+                            <p class="text-end font-bold">{{ formatCurrency(shippingFee) }}</p>
                             <p class="text-gray-600 text-sm font-normal">Arrives on Jul 16</p>
                         </div>
                     </div>
@@ -95,7 +104,7 @@
                     <div class="flex flex-row justify-between">
                         <p class="text-gray-600">Total</p>
                         <div>
-                            <p class="text-end font-bold">$103.88</p>
+                            <p class="text-end font-bold">{{ formatCurrency(calculatedTotal) }}</p>
                         </div>
                     </div>
                     <div class="flex gap-2">
@@ -114,8 +123,8 @@
 
 
     </div>
-    <div v-else>
-        <p class="text-gray-600">Your cart is empty.</p>
+    <div v-else class="text-gray-600 min-h-screen ">
+        <p>Your cart is empty.</p>
     </div>
 </template>
 
@@ -126,35 +135,60 @@ export default {
     data() {
         return {
             cartData: null,
-            shippingfee: 300,
+            shippingFee: 300,
+            quantity: 1,
         };
     },
     mounted() {
         this.fetchCartData();
     },
     methods: {
-        calculateTotal() {
-            if (this.cartData) {
-                // Assuming cartData has properties subtotal and shippingFee
-                const subtotal = this.cartData.subtotal || 0;
-                const shippingFee = this.cartData.shippingFee || 0;
-
-                return subtotal + shippingFee;
-            }
-
-            return 0; // Default to 0 if cartData is not available
+        formatCurrency(value) {
+            const numericValue = parseFloat(value);
+            return isNaN(numericValue) ? '-' : numericValue.toLocaleString('en-KE', { style: 'currency', currency: 'KES' });
         },
         async fetchCartData() {
             try {
-                // Replace 'YOUR_BACKEND_API_ENDPOINT' with the actual endpoint
                 const response = await axios.get('http://localhost:3000/api/allCartItems');
-                console.log("Cart Data:", response)
-                // Assuming the response contains cart data in the 'data' property
                 this.cartData = response.data;
+
+                console.log('Cart Data:', response.data);
+                return this.cartData;
             } catch (error) {
-                console.error('Error fetching cart data:', error);
+                console.error(error);
+                throw error;
             }
         },
+
     },
+
+    computed: {
+        cartTotalWithoutShipping() {
+            if (!this.cartData) {
+                return 0;
+            }
+
+            // Calculate the total without shipping by summing up the prices of all items in the cart
+            return this.cartData.reduce((sum, item) => {
+                if (item.sale_price > 0) {
+                    console.log('quantity', this.quantity)
+                    return sum + (this.quantity * (item.sale_price));
+
+                }
+                return sum + (this.quantity * (item.price));
+
+            }, 0);
+        },
+        calculatedTotal() {
+            return this.cartTotalWithoutShipping + this.shippingFee;
+        },
+    },
+
 }
+
+
+
+
+
+
 </script>
