@@ -227,6 +227,33 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
+
+// Admin login
+app.post('/api/admin-login', async (req, res) => {
+    const { email, pswd } = req.body;
+
+    try {
+        const result = await client.query('SELECT * FROM shop_admin WHERE email = $1', [email]);
+
+        if (result.rows.length === 0) {
+            res.status(401).send('Invalid credentials');
+            return;
+        }
+
+        const isValidpswd = await bcrypt.compare(pswd, result.rows[0].pswd);
+
+        if (isValidpswd) {
+            res.redirect('/adminpage');
+            // res.status(200).send('Login successful');
+        } else {
+            res.status(401).send('Invalid credentials');
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
 app.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`);
 });

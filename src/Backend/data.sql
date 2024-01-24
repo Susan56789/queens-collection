@@ -62,10 +62,10 @@ CREATE TABLE customers (
 	dob date,
     email VARCHAR(255) UNIQUE
 );
-
+select * from customers;
 CREATE TABLE cart (
     cart_id SERIAL PRIMARY KEY,
-    customer_id INT REFERENCES customers(customer_id),
+    customer_id INT,
     product_id INT REFERENCES products(product_id),
 	product_name VARCHAR(255),
     price NUMERIC,
@@ -114,3 +114,9 @@ CREATE TABLE shop_admin (
 	dob date,
     email VARCHAR(255) UNIQUE
 );
+
+INSERT INTO shop_admin (fname,lname,phone,gender,city,country,pswd,dob,email) VALUES (
+'susan','W','0796486115','Female','Nairobi','Kenya','Admin254','03/11/2000','susanwairimu177@gmail.com'
+);
+
+SELECT * FROM shop_admin;
