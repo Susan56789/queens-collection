@@ -138,7 +138,6 @@ app.post('/api/addToCart', (req, res) => {
     });
 });
 
-
 // Endpoint to get all items in cart
 app.get('/api/allCartItems', async (req, res) => {
 

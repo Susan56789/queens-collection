@@ -93,7 +93,6 @@ export default {
             this.addToCart();
         },
         addToCart() {
-
             const product = this.selectedProduct;
 
             if (product && product.product_id && product.price && product.quantity) {

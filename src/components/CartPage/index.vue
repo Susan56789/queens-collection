@@ -23,7 +23,7 @@
                         </div>
                         <!-- Price Information -->
                         <div class="self-center text-center">
-                            <div v-if="product.sale_price">
+                            <div v-if="product.sale_price > 0">
                                 <p class="text-gray-600 font-normal text-sm line-through">
                                     {{ formatCurrency(product.price) }}
 
@@ -31,11 +31,12 @@
                                 <span class="text-emerald-500 ml-2">
                                     (-{{ ((product.price - product.sale_price) / product.price * 100).toFixed(0) }}% OFF)
                                 </span>
+                                <p class="text-gray-800 font-normal text-xl">{{ formatCurrency(product.sale_price
+                                ) }}</p>
                             </div>
-                            <!-- Always show the discounted price -->
-                            <p class="text-gray-800 font-normal text-xl">{{ formatCurrency(product.sale_price ?
-                                product.sale_price :
-                                product.price) }}</p>
+                            <div v-else>
+                                <p class="text-gray-800 font-normal text-xl">{{ formatCurrency(product.price) }}</p>
+                            </div>
                         </div>
                         <!-- Remove Product Icon -->
                         <div class="self-center">
