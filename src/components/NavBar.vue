@@ -81,7 +81,7 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex';
+
 
 export default {
     name: 'NavBar',
@@ -94,10 +94,6 @@ export default {
         toggleNavbar() {
             this.isNavOpen = !this.isNavOpen;
         },
-        ...mapActions(['login', 'logout']),
-    },
-    computed: {
-        ...mapGetters(['isLoggedIn']),
     },
 }
 </script>

@@ -89,19 +89,20 @@ const routes = [
 
     },
     {
-        path: '/adminpage',
+        path: '/adminpage/dashboard',
         component: () => import('./components/AdminDashboard/index.vue'),
+
         children: [
             {
                 path: '',
                 component: () => import('./components/AdminDashboard/SummaryPage.vue')
             },
             {
-                path: '/orderpage',
+                path: '/adminpage/orderpage',
                 component: () => import('./components/AdminDashboard/OrdersPage.vue')
             },
             {
-                path: '/newproduct',
+                path: '/adminpage/newproduct',
                 component: () => import('./components/AdminDashboard/AddProducts.vue')
             }
         ]
@@ -112,22 +113,6 @@ const router = createRouter({
     history: createWebHistory(),
     routes,
     mode: 'history',
-});
-
-
-// Add a loading state to the router
-router.isLoading = false;
-
-// Navigation guards to manage the loading state
-router.beforeEach((to, from, next) => {
-    router.isLoading = true;
-    next();
-});
-
-router.afterEach(() => {
-    setTimeout(() => {
-        router.isLoading = false;
-    }, 500); // You may adjust the timeout based on your preference
 });
 
 

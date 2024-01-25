@@ -229,30 +229,47 @@ app.post('/api/login', async (req, res) => {
 
 
 // Admin login
-app.post('/api/admin-login', async (req, res) => {
-    const { email, pswd } = req.body;
-
+app.post('/userverify', async (req, res) => {
     try {
+        const { email, pswd } = req.body;
+
+
+
+        // Fetch user details from the database
         const result = await client.query('SELECT * FROM shop_admin WHERE email = $1', [email]);
 
         if (result.rows.length === 0) {
-            res.status(401).send('Invalid credentials');
-            return;
+            return res.status(401).json({ success: false, message: 'Invalid email or password' });
         }
 
-        const isValidpswd = await bcrypt.compare(pswd, result.rows[0].pswd);
+        const user = result.rows[0];
 
-        if (isValidpswd) {
-            res.redirect('/adminpage');
-            // res.status(200).send('Login successful');
+
+
+        const DBPassword = await bcrypt.hash(user.pswd, 10);
+
+
+
+
+        // Compare hashed password
+        const passwordMatch = await bcrypt.compare(pswd, DBPassword);
+
+
+
+
+        if (passwordMatch) {
+            // Authentication successful
+            res.status(200).json({ success: true, message: 'Login successful' });
         } else {
-            res.status(401).send('Invalid credentials');
+            // Authentication failed
+            res.status(401).json({ success: false, message: 'Invalid email or password' });
         }
     } catch (error) {
-        console.error(error);
-        res.status(500).send('Internal Server Error');
+        console.error('Error during authentication:', error);
+        res.status(500).json({ success: false, message: 'Internal Server Error' });
     }
 });
+
 
 app.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`);
