@@ -1,7 +1,7 @@
 <template>
     <section class="relative mx-auto">
         <!-- navbar -->
-        <nav class="flex justify-between bg-white-900 text-black w-screen shadow-xl">
+        <nav class="flex-col flex-grow pb-4 md:pb-0 md:flex md:justify-end md:flex-row">
             <div class="px-5 xl:px-12 py-6 flex w-full items-center">
                 <a class="text-3xl font-bold font-heading" href="/">
                     <img class="h-20" src="/images/Logo2.png" alt="Queen's Collection Logo">
@@ -45,36 +45,41 @@
                         </svg>
                     </router-link>
                     <router-link v-else class="flex items-center hover:text-white-200" to="/user-account">
-                        <!-- Link to user account page -->
-                        <!-- You may want to customize the icon or text based on user information -->
+
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hover:text-white-200" fill="none"
                             viewBox="0 0 24 24" stroke="currentColor">
-                            <!-- Replace with appropriate user icon or text -->
+
                             <circle cx="12" cy="12" r="10" />
                         </svg>
                     </router-link>
-
-
-
                 </div>
             </div>
-            <!-- Responsive navbar -->
 
-            <a class="navbar-burger self-center mr-12 xl:hidden md:hidden" href="#" @click="toggleNavbar">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hover:text-white-200" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            <!-- Toggle Button -->
+            <a class="rounded-lg md:hidden focus:outline-none 
+            focus:shadow-outline absolute top-0 right-0 mr-5 mt-5" href="#" @click="toggleNavbar">
+                <svg fill="currentColor" viewBox="0 0 20 20" class="w-6 h-6">
+                    <path v-if="!isNavOpen" fill-rule="evenodd"
+                        d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM9 15a1 1 0 011-1h6a1 1 0 110 2h-6a1 1 0 01-1-1z"
+                        clip-rule="evenodd"></path>
+                    <path v-if="isNavOpen" fill-rule="evenodd"
+                        d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                        clip-rule="evenodd"></path>
                 </svg>
             </a>
 
             <!-- Responsive Nav Links -->
-            <ul v-if="isNavOpen" class="xl:hidden fixed mt-50 ml-50 
-                flex flex-col items-start bg-grey-900 text-black w-full shadow-xl">
-                <li><router-link class="hover:text-white-200 py-2 px-4" to="/">Home</router-link></li>
-                <li><router-link class="hover:text-white-200 py-2 px-4" to="/about">About Us</router-link></li>
-                <li><router-link class="hover:text-white-200 py-2 px-4" to="/contact">Contact Us</router-link></li>
-                <li><router-link class="hover:text-white-200 py-2 px-4" to="/shop">Shop</router-link></li>
-            </ul>
+            <div class="responsive-nav">
+                <ul v-if="isNavOpen" class="xl:hidden fixed mt-50 ml-50 
+                    flex flex-col items-start bg-grey-900 text-black w-full shadow-xl">
+                    <li><router-link class="hover:text-white-200 py-2 px-4" to="/">Home</router-link></li>
+                    <li><router-link class="hover:text-white-200 py-2 px-4" to="/about">About Us</router-link></li>
+                    <li><router-link class="hover:text-white-200 py-2 px-4" to="/contact">Contact Us</router-link></li>
+                    <li><router-link class="hover:text-white-200 py-2 px-4" to="/shop">Shop</router-link></li>
+                </ul>
+
+            </div>
+
         </nav>
 
     </section>
@@ -88,13 +93,13 @@ export default {
     data() {
         return {
             isNavOpen: false,
-        };
+        }
     },
     methods: {
         toggleNavbar() {
             this.isNavOpen = !this.isNavOpen;
         },
-    },
+    }
 }
 </script>
 
@@ -103,5 +108,9 @@ img {
     width: 70px;
     height: 70px;
     border-radius: 50%;
+}
+
+.responsive-nav {
+    margin-bottom: 50px;
 }
 </style>
