@@ -1,6 +1,6 @@
 <template>
     <div class="py-16 bg-white">
-        <div class="container m-auto px-6 space-y-8 text-gray-500 md:px-12 lg:px-20">
+        <div v-if="localUserData" class="container m-auto px-6 space-y-8 text-gray-500 md:px-12 lg:px-20">
             <div class="md:flex no-wrap md:-mx-2">
                 <!-- Left Side -->
                 <div class="w-full md:w-3/12 md:mx-2">
@@ -21,9 +21,11 @@
                                 </div>
                             </div>
                             <div class="text-center mt-2">
-                                <h3 class="text-2xl text-slate-700 font-bold leading-normal mb-1">Jane Doe</h3>
+                                <h3 class="text-2xl text-slate-700 font-bold leading-normal mb-1">{{ localUserData.fname }}
+                                </h3>
                                 <div class="text-xs mt-0 mb-2 text-slate-400 font-bold uppercase">
-                                    <i class="fas fa-map-marker-alt mr-2 text-slate-400 opacity-75"></i>Nairobi,Kenya
+                                    <i class="fas fa-map-marker-alt mr-2 text-slate-400 opacity-75"></i>{{
+                                        localUserData.city }}, {{ localUserData.country }}
                                 </div>
                             </div>
                             <div class="mt-6 py-6 border-t border-slate-200 text-center">
@@ -59,40 +61,47 @@
                             <div class="grid md:grid-cols-2 text-sm">
                                 <div class="grid grid-cols-2">
                                     <div class="px-4 py-2 font-semibold">First Name</div>
-                                    <div class="px-4 py-2">Jane</div>
+                                    <div class="px-4 py-2">{{ localUserData.fname }}</div>
                                 </div>
                                 <div class="grid grid-cols-2">
                                     <div class="px-4 py-2 font-semibold">Last Name</div>
-                                    <div class="px-4 py-2">Doe</div>
+                                    <div class="px-4 py-2">{{ localUserData.lname }}</div>
                                 </div>
                                 <div class="grid grid-cols-2">
                                     <div class="px-4 py-2 font-semibold">Gender</div>
-                                    <div class="px-4 py-2">Female</div>
+                                    <div class="px-4 py-2">{{ localUserData.gender }}</div>
                                 </div>
                                 <div class="grid grid-cols-2">
                                     <div class="px-4 py-2 font-semibold">Contact No.</div>
-                                    <div class="px-4 py-2">+11 998001001</div>
+                                    <div class="px-4 py-2">{{ localUserData.phone }}</div>
                                 </div>
                                 <div class="grid grid-cols-2">
                                     <div class="px-4 py-2 font-semibold"> Address</div>
-                                    <div class="px-4 py-2">Beech Creek, PA, Pennsylvania</div>
+                                    <div class="px-4 py-2">{{ localUserData.address }}</div>
                                 </div>
 
                                 <div class="grid grid-cols-2">
                                     <div class="px-4 py-2 font-semibold">Email.</div>
                                     <div class="px-4 py-2">
-                                        <a class="text-blue-800" href="mailto:jane@example.com">jane@example.com</a>
+                                        <div class="px-4 py-2">{{ localUserData.email
+                                        }}</div>
                                     </div>
                                 </div>
                                 <div class="grid grid-cols-2">
                                     <div class="px-4 py-2 font-semibold">Birthday</div>
-                                    <div class="px-4 py-2">Feb 06, 1998</div>
+                                    <div class="px-4 py-2">{{ localUserData.dob }}</div>
                                 </div>
                             </div>
                         </div>
-                        <a href="#" class="block w-full text-blue-800 text-sm font-semibold 
-                            rounded-lg hover:bg-gray-100 focus:outline-none focus:shadow-outline 
-                            focus:bg-gray-100 hover:shadow-xs p-3 my-4">Edit</a>
+
+                        <button @click="logout" class="flex items-center hover:text-white-200">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
+                                </path>
+                            </svg>
+                        </button>
                     </div>
                     <!-- End of about section -->
 
@@ -139,10 +148,53 @@
 </template>
 
 <script>
+import userService from '@/auth/userService';
+
 export default {
-    name: 'UserPage'
+    name: 'UserPage',
+    props: ['userData'],
+
+    data() {
+        return {
+            localUserData: null,
+        };
+    },
+
+    async created() {
+        await this.fetchUser();
+    },
+
+    methods: {
+        async fetchUser() {
+            try {
+                // If userData is provided as a query parameter, use it directly
+                const userDataQueryParam = this.$route.query.userData;
+
+                if (userDataQueryParam) {
+                    this.localUserData = JSON.parse(userDataQueryParam);
+                    console.log('fetchedUserData', this.localUserData)
+                    return;
+                }
+
+                // Otherwise, fetch user data using the userService
+                const fetchedUserData = await userService.getUserData();
+                this.localUserData = fetchedUserData;
+
+                console.log('fetchedUserData', this.localUserData)
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+            }
+        },
+        logout() {
+            userService.logout();
+            this.$router.push('/login'); // Redirect to login page after logout
+        },
+    },
 }
+
 </script>
+
+
 
 <style scoped>
 :root {

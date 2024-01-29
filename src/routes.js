@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import authService from './auth/authService';
+import userService from './auth/userService';
 
 const routes = [
 
@@ -27,10 +28,7 @@ const routes = [
                 path: '/login',
                 component: () => import('./components/LoginPage.vue')
             },
-            {
-                path: '/logout',
-                component: () => import('./components/LogoutPage.vue')
-            },
+
             {
                 path: '/faqs',
                 component: () => import('./components/FaqsPage.vue')
@@ -47,10 +45,7 @@ const routes = [
                 path: '/admin',
                 component: () => import('./components/AdminDashboard/AdminLogin.vue')
             },
-            {
-                path: '/user-account',
-                component: () => import('./components/UserPage/index.vue')
-            },
+
 
             {
                 path: '/privacy-policy',
@@ -80,14 +75,37 @@ const routes = [
                 path: '/category/:id',
                 component: () => import('./components/SelectedCategory/index.vue')
             },
+            // Customers Route
+            {
+
+                path: '/user-account',
+                component: () => import('./components/UserPage/index.vue'),
+                name: 'UserPage',
+                props: true,
+                beforeEnter: (to, from, next) => {
+                    // Check if the user is authenticated
+                    if (userService.isAuthenticated()) {
+                        // Clear the logout timer when navigating to a new route
+                        userService.clearLogoutTimer();
+                        // User is authenticated, proceed to the admin page
+                        next();
+                    } else {
+                        // User is not authenticated, replace the history entry with the login page
+                        next({ path: '/login', replace: true });
+                    }
+                },
+
+            },
             {
                 path: '/:pathMatch(.*)*',
                 component: () => import('./components/404Page.vue')
             },
 
+
         ]
 
     },
+
 
     // Admin routes
     {

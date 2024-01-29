@@ -6,12 +6,14 @@
             </div>
 
             <div class="bg-white shadow w-full rounded-lg divide-y divide-gray-200">
-                <div class="px-5 py-7">
+                <form @submit.prevent="login" class="px-5 py-7">
                     <label class="font-semibold text-sm text-gray-600 pb-1 block">E-mail</label>
-                    <input type="text" class="border rounded-lg px-3 py-2 mt-1 mb-5 text-sm w-full" />
+                    <input v-model="credentials.email" type="email"
+                        class="border rounded-lg px-3 py-2 mt-1 mb-5 text-sm w-full" />
                     <label class="font-semibold text-sm text-gray-600 pb-1 block">Password</label>
-                    <input type="text" class="border rounded-lg px-3 py-2 mt-1 mb-5 text-sm w-full" />
-                    <button type="button"
+                    <input v-model="credentials.pswd" type="password"
+                        class="border rounded-lg px-3 py-2 mt-1 mb-5 text-sm w-full" />
+                    <button @click="login" type="button"
                         class="transition duration-200 bg-red-500 hover:bg-red-600 focus:bg-red-700 focus:shadow-sm focus:ring-4 focus:ring-red-500 focus:ring-opacity-50 text-white w-full py-2.5 rounded-lg text-sm shadow-sm hover:shadow-md font-semibold text-center inline-block">
                         <span class="inline-block mr-2">Login</span>
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
@@ -20,7 +22,7 @@
                                 d="M17 8l4 4m0 0l-4 4m4-4H3" />
                         </svg>
                     </button>
-                </div>
+                </form>
                 <div class="py-5">
                     <div class="grid grid-cols-2 gap-1">
                         <div class="text-center sm:text-left whitespace-nowrap">
@@ -66,9 +68,49 @@
         </div>
     </div>
 </template>
-
 <script>
+import userService from '@/auth/userService';
+
 export default {
-    name: 'LoginPage'
-}
+    name: 'LoginPage',
+    data() {
+        return {
+            credentials: {
+                email: '',
+                pswd: '',
+            },
+        };
+    },
+    methods: {
+        async login() {
+            try {
+                console.log('Sending login request with credentials:', this.credentials);
+                const response = await userService.login(this.credentials);
+
+                if (response.success) {
+                    // Fetch user data after successful login
+                    const userDataResponse = await userService.getUserDataByEmail(this.credentials.email);
+
+                    if (userDataResponse.success) {
+                        // Navigate to the user page and pass user data
+                        this.$router.push({
+                            name: 'UserPage',
+                            query: { userData: JSON.stringify(userDataResponse.data) },
+                        });
+
+                    } else {
+                        console.error('Failed to fetch user data:', userDataResponse.message);
+                    }
+                } else {
+                    console.error('Login failed:', response.message);
+                }
+            } catch (error) {
+                console.error('Error during login:', error);
+            }
+        },
+    },
+};
 </script>
+
+
+

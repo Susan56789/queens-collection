@@ -26,7 +26,10 @@ const client = new Client({
 });
 
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:8080', // Replace with the actual origin of your Vue.js app
+    credentials: true,
+}));
 
 client.connect((err) => {
     if (err) {
@@ -42,7 +45,7 @@ client.connect((err) => {
 require('./routes/productRoutes')(app, client);
 require('./routes/cartRoutes')(app, client);
 require('./routes/categoryRoutes')(app, client);
-
+require('./routes/customerRoutes')(app, client);
 
 
 // User registration
@@ -62,27 +65,28 @@ app.post('/api/register', async (req, res) => {
 
 // User login
 app.post('/api/login', async (req, res) => {
-    const { email, pswd } = req.body;
-
     try {
+        const { email, pswd } = req.body;
+        // Fetch user details from the database
         const result = await client.query('SELECT * FROM customers WHERE email = $1', [email]);
 
         if (result.rows.length === 0) {
-            res.status(401).send('Invalid credentials');
-            return;
+            return res.status(401).json({ success: false, message: 'Invalid email or password' });
         }
-        const isValidpswd = await bcrypt.compare(pswd, result.rows[0].pswd);
-
-        if (isValidpswd) {
-            res.status(200).send('Login successful');
+        const user = result.rows[0];
+        const DBPassword = await bcrypt.hash(user.pswd, 10);
+        // Compare hashed password
+        const passwordMatch = await bcrypt.compare(pswd, DBPassword);
+        if (passwordMatch) {
+            // Authentication successful
+            res.status(200).json({ success: true, message: 'Login successful' });
+        } else {
+            // Authentication failed
+            res.status(401).json({ success: false, message: 'Invalid email or password' });
         }
-        else {
-            res.status(401).send('Invalid credentials');
-        }
-    }
-    catch (error) {
-        console.error(error);
-        res.status(500).send('Internal Server Error');
+    } catch (error) {
+        console.error('Error during authentication:', error);
+        res.status(500).json({ success: false, message: 'Internal Server Error' });
     }
 });
 

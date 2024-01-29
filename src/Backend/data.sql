@@ -62,7 +62,10 @@ CREATE TABLE customers (
 	dob date,
     email VARCHAR(255) UNIQUE
 );
+Insert into customers (fname,lname,phone,gender,address,city,country,pswd,dob,email) VALUES
+('susan','wairimu','+254796486115','female','Nairobi','Nairobi','Kenya','User1234.','03/11/2000','devnimoh@gmail.com');
 select * from customers;
+
 CREATE TABLE cart (
     cart_id SERIAL PRIMARY KEY,
     customer_id INT,
