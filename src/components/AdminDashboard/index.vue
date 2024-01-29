@@ -27,7 +27,7 @@
                             <div class="block w-px h-6 mx-3 bg-gray-400 bg-gray-700"></div>
                         </li>
                         <li>
-                            <a href="#" class="flex items-center mr-4 hover:text-blue-100">
+                            <button @click="logout" class="flex items-center mr-4 hover:text-blue-100">
                                 <span class="inline-flex mr-1">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                         xmlns="http://www.w3.org/2000/svg">
@@ -37,7 +37,7 @@
                                     </svg>
                                 </span>
                                 Logout
-                            </a>
+                            </button>
                         </li>
                     </ul>
                 </div>
@@ -166,8 +166,15 @@
 </template>
 
 <script>
+import authService from '@/auth/authService';
+
 export default {
     name: 'AdminDashboard',
-
+    methods: {
+        logout() {
+            authService.logout();
+            this.$router.push('/admin'); // Redirect to login page after logout
+        },
+    },
 }
 </script>

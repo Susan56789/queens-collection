@@ -101,8 +101,8 @@ const routes = [
                 // User is authenticated, proceed to the admin page
                 next();
             } else {
-                // User is not authenticated, redirect to the login page
-                next('/admin');
+                // User is not authenticated, replace the history entry with the login page
+                next({ path: '/admin', replace: true });
             }
         },
 
