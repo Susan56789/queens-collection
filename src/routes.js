@@ -96,6 +96,8 @@ const routes = [
         beforeEnter: (to, from, next) => {
             // Check if the user is authenticated
             if (authService.isAuthenticated()) {
+                // Clear the logout timer when navigating to a new route
+                authService.clearLogoutTimer();
                 // User is authenticated, proceed to the admin page
                 next();
             } else {
