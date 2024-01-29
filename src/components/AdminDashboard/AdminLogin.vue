@@ -6,14 +6,14 @@
             </div>
 
             <div class="bg-white shadow w-full rounded-lg divide-y divide-gray-200">
-                <form @submit.prevent="userverify" class="px-5 py-7">
+                <form @submit.prevent="login" class="px-5 py-7">
                     <label class="font-semibold text-sm text-gray-600 pb-1 block">E-mail</label>
-                    <input v-model="admindetails.email" type="text"
+                    <input v-model="credentials.email" type="text"
                         class="border rounded-lg px-3 py-2 mt-1 mb-5 text-sm w-full" />
                     <label class="font-semibold text-sm text-gray-600 pb-1 block">Password</label>
-                    <input v-model="admindetails.pswd" type="password"
+                    <input v-model="credentials.pswd" type="password"
                         class="border rounded-lg px-3 py-2 mt-1 mb-5 text-sm w-full" />
-                    <button @click="userverify" type="button"
+                    <button @click="login" type="button"
                         class="transition duration-200 bg-red-500 hover:bg-red-600 focus:bg-red-700 focus:shadow-sm focus:ring-4 focus:ring-red-500 focus:ring-opacity-50 text-white w-full py-2.5 rounded-lg text-sm shadow-sm hover:shadow-md font-semibold text-center inline-block">
                         <span class="inline-block mr-2">Login</span>
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
@@ -70,11 +70,13 @@
 </template>
 
 <script>
+import authService from '@/auth/authService'
+
 export default {
     name: 'AdminLogin',
     data() {
         return {
-            admindetails: {
+            credentials: {
                 email: '',
                 pswd: '',
 
@@ -82,36 +84,25 @@ export default {
         }
     },
     methods: {
-        async userverify() {
-            try {
-                const response = await fetch('http://localhost:3000/userverify', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        email: this.admindetails.email,
-                        pswd: this.admindetails.pswd,
-                    }),
+        login() {
+            console.log('Sending login request with credentials:', this.credentials);
+            authService.login(this.credentials)
+                .then((response) => {
+                    console.log('Server Response:', response);
+                    if (response.success) {
+                        // Authentication successful, you can redirect to a protected route
+                        this.$router.push('/adminpage/dashboard');
+                    } else {
+                        // Authentication failed, handle accordingly
+                        console.error('Login failed:', response.message);
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error during login:', error);
                 });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    // Authentication successful, you can navigate to the admin page or perform other actions
-                    console.log('Login successful');
-                    // Navigate to the admin page using Vue Router
-                    this.$router.push('/adminpage/dashboard');
-                    // Clear the password field for security reasons
-
-                } else {
-                    // Authentication failed, handle accordingly
-                    console.error('Login failed:', data.message);
-                }
-            } catch (error) {
-                console.error('Error during user verification:', error);
-            }
         },
-    }
+    },
+
+
 }
 </script>

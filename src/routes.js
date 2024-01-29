@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
-
+import authService from './auth/authService';
 
 const routes = [
 
@@ -88,9 +88,21 @@ const routes = [
         ]
 
     },
+
+    // Admin routes
     {
         path: '/adminpage/dashboard',
         component: () => import('./components/AdminDashboard/index.vue'),
+        beforeEnter: (to, from, next) => {
+            // Check if the user is authenticated
+            if (authService.isAuthenticated()) {
+                // User is authenticated, proceed to the admin page
+                next();
+            } else {
+                // User is not authenticated, redirect to the login page
+                next('/admin');
+            }
+        },
 
         children: [
             {
