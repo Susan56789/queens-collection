@@ -61,7 +61,9 @@ const routes = [
             },
             {
                 path: '/checkout',
-                component: () => import('./components/CheckoutPage/index.vue')
+                component: () => import('./components/CheckoutPage/index.vue'),
+                name: 'CheckoutPage',
+                props: true
             },
             {
                 path: '/thank-you',

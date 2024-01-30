@@ -271,7 +271,20 @@ export default {
             } catch (error) {
                 console.error('An error occurred while updating the cart:', error.message);
             }
-        }
+        },
+        checkout() {
+            if (this.cartData.length === 0) {
+                console.error('Cannot proceed with checkout. Cart is empty.');
+                return;
+            }
+
+            const cartDataArray = Array.from(this.cartData); // Fix the typo here
+
+            this.$router.push({ name: 'CheckoutPage', query: { cartData: JSON.stringify(cartDataArray) } });
+        },
+
+
+
 
     },
 

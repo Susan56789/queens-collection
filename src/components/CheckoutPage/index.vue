@@ -14,22 +14,21 @@
         </div>
     </div>
     <div class="w-full bg-white border-t border-b border-gray-200 px-5 py-10 text-gray-800">
-        <div class="w-full">
+        <div v-if="localcartData && localcartData.length > 0" class="w-full">
             <div class="-mx-3 md:flex items-start">
                 <div class="px-3 md:w-7/12 lg:pr-10">
                     <div class="w-full mx-auto text-gray-800 font-light mb-6 border-b border-gray-200 pb-6">
-                        <div class="w-full flex items-center">
+                        <div v-for="(product, index) in localcartData" :key="index" class="w-full flex items-center">
                             <div class="overflow-hidden rounded-lg w-16 h-16 bg-gray-50 border border-gray-200">
-                                <img src="https://images.unsplash.com/photo-1572635196237-14b3f281503f?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1160&q=80"
-                                    alt="">
+                                <img :src="product.image_path" :alt="product.product_name">
                             </div>
                             <div class="flex-grow pl-3">
-                                <h6 class="font-semibold uppercase text-gray-600">Ray Ban Sunglasses.</h6>
-                                <p class="text-gray-400">x 1</p>
+                                <h6 class="font-semibold uppercase text-gray-600">{{ product.product_name }}</h6>
+                                <p class="text-gray-400">x {{ product.quantity }}</p>
                             </div>
                             <div>
-                                <span class="font-semibold text-gray-600 text-xl">$210</span><span
-                                    class="font-semibold text-gray-600 text-sm">.00</span>
+                                <span class="font-semibold text-gray-600 text-xl">{{ formatCurrency(product.price)
+                                }}</span><span class="font-semibold text-gray-600 text-sm">.00</span>
                             </div>
                         </div>
                     </div>
@@ -55,15 +54,15 @@
                                 <span class="text-gray-600">Subtotal</span>
                             </div>
                             <div class="pl-3">
-                                <span class="font-semibold">$190.91</span>
+                                <span class="font-semibold">{{ formatCurrency(cartTotal + shippingFee) }}</span>
                             </div>
                         </div>
                         <div class="w-full flex items-center">
                             <div class="flex-grow">
-                                <span class="text-gray-600">Taxes (GST)</span>
+                                <span class="text-gray-600">16% VAT</span>
                             </div>
                             <div class="pl-3">
-                                <span class="font-semibold">$19.09</span>
+                                <span class="font-semibold">{{ formatCurrency(cartTotal - (cartTotal * 0.96)) }}</span>
                             </div>
                         </div>
                     </div>
@@ -73,31 +72,48 @@
                                 <span class="text-gray-600">Total</span>
                             </div>
                             <div class="pl-3">
-                                <span class="font-semibold text-gray-400 text-sm">AUD</span> <span
-                                    class="font-semibold">$210.00</span>
+                                <span class="font-semibold">{{ formatCurrency(cartTotal) }}</span>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="px-3 md:w-5/12">
+
+                <div class="px-3">
                     <div
                         class="w-full mx-auto rounded-lg bg-white border border-gray-200 p-3 text-gray-800 font-light mb-6">
-                        <div class="w-full flex mb-3 items-center">
-                            <div class="w-32">
-                                <span class="text-gray-600 font-semibold">Contact</span>
+
+                        <form @submit.prevent="submitOrder" class="w-full items-center">
+                            <div class="form-group mb-4">
+                                <label for="name" class="block text-sm font-medium text-gray-700">Name:</label>
+                                <input type="text" id="name" v-model="userData.name" required
+                                    class="mt-1 p-2 w-full border rounded-md" />
                             </div>
-                            <div class="flex-grow pl-3">
-                                <span>Scott Windon</span>
+
+                            <div class="form-group mb-4">
+                                <label for="email" class="block text-sm font-medium text-gray-700">Email:</label>
+                                <input type="email" id="email" v-model="userData.email" required
+                                    class="mt-1 p-2 w-full border rounded-md" />
                             </div>
-                        </div>
-                        <div class="w-full flex items-center">
-                            <div class="w-32">
-                                <span class="text-gray-600 font-semibold">Billing Address</span>
+
+                            <!-- Add more fields as needed (address, phone, location) -->
+                            <div class="form-group mb-4">
+                                <label for="address" class="block text-sm font-medium text-gray-700">Address:</label>
+                                <input type="text" id="address" v-model="userData.address"
+                                    class="mt-1 p-2 w-full border rounded-md" />
                             </div>
-                            <div class="flex-grow pl-3">
-                                <span>123 George Street, Sydney, NSW 2000 Australia</span>
+
+                            <div class="form-group mb-4">
+                                <label for="phone" class="block text-sm font-medium text-gray-700">Phone:</label>
+                                <input type="text" id="phone" v-model="userData.phone"
+                                    class="mt-1 p-2 w-full border rounded-md" />
                             </div>
-                        </div>
+
+                            <div class="form-group mb-4">
+                                <label for="location" class="block text-sm font-medium text-gray-700">Location:</label>
+                                <input type="text" id="location" v-model="userData.location"
+                                    class="mt-1 p-2 w-full border rounded-md" />
+                            </div>
+                        </form>
                     </div>
                     <div class="w-full mx-auto rounded-lg bg-white border border-gray-200 text-gray-800 font-light mb-6">
                         <div class="w-full p-3 border-b border-gray-200">
@@ -105,107 +121,132 @@
                                 <label for="type1" class="flex items-center cursor-pointer">
                                     <input type="radio" class="form-radio h-5 w-5 text-red-500" name="type" id="type1"
                                         checked>
-                                    <img src="https://leadershipmemphis.org/wp-content/uploads/2020/08/780370.png"
+                                    <img src="https://iconape.com/wp-content/files/xn/364965/svg/mpesa-seeklogo.com.svg"
                                         class="h-6 ml-3">
                                 </label>
                             </div>
                             <div>
                                 <div class="mb-3">
-                                    <label class="text-gray-600 font-semibold text-sm mb-2 ml-1">Name on card</label>
-                                    <div>
-                                        <input
-                                            class="w-full px-3 py-2 mb-1 border border-gray-200 rounded-md focus:outline-none focus:border-red-500 transition-colors"
-                                            placeholder="John Smith" type="text" />
-                                    </div>
+
+                                    <form @submit.prevent="makePayment">
+                                        <label for="phone">Phone:</label>
+                                        <input v-model="phone" type="tel" id="phone" placeholder="07xx xxx xxx" required
+                                            class="border p-2 mb-4"><br />
+                                        <label for="amount">Amount:</label>
+                                        <input v-model="amount" type="number" id="amount" required class="border p-2 mb-4">
+                                        <button @click="makePayment" type="submit"
+                                            class="bg-red-500 text-white p-2 rounded">Pay Now</button>
+                                    </form>
                                 </div>
-                                <div class="mb-3">
-                                    <label class="text-gray-600 font-semibold text-sm mb-2 ml-1">Card number</label>
-                                    <div>
-                                        <input
-                                            class="w-full px-3 py-2 mb-1 border border-gray-200 rounded-md focus:outline-none focus:border-red-500 transition-colors"
-                                            placeholder="0000 0000 0000 0000" type="text" />
-                                    </div>
-                                </div>
-                                <div class="mb-3 -mx-2 flex items-end">
-                                    <div class="px-2 w-1/4">
-                                        <label class="text-gray-600 font-semibold text-sm mb-2 ml-1">Expiration date</label>
-                                        <div>
-                                            <select
-                                                class="form-select w-full px-3 py-2 mb-1 border border-gray-200 rounded-md focus:outline-none focus:border-red-500 transition-colors cursor-pointer">
-                                                <option value="01">01 - January</option>
-                                                <option value="02">02 - February</option>
-                                                <option value="03">03 - March</option>
-                                                <option value="04">04 - April</option>
-                                                <option value="05">05 - May</option>
-                                                <option value="06">06 - June</option>
-                                                <option value="07">07 - July</option>
-                                                <option value="08">08 - August</option>
-                                                <option value="09">09 - September</option>
-                                                <option value="10">10 - October</option>
-                                                <option value="11">11 - November</option>
-                                                <option value="12">12 - December</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="px-2 w-1/4">
-                                        <select
-                                            class="form-select w-full px-3 py-2 mb-1 border border-gray-200 rounded-md focus:outline-none focus:border-red-500 transition-colors cursor-pointer">
-                                            <option value="2020">2020</option>
-                                            <option value="2021">2021</option>
-                                            <option value="2022">2022</option>
-                                            <option value="2023">2023</option>
-                                            <option value="2024">2024</option>
-                                            <option value="2025">2025</option>
-                                            <option value="2026">2026</option>
-                                            <option value="2027">2027</option>
-                                            <option value="2028">2028</option>
-                                            <option value="2029">2029</option>
-                                        </select>
-                                    </div>
-                                    <div class="px-2 w-1/4">
-                                        <label class="text-gray-600 font-semibold text-sm mb-2 ml-1">Security code</label>
-                                        <div>
-                                            <input
-                                                class="w-full px-3 py-2 mb-1 border border-gray-200 rounded-md focus:outline-none focus:border-red-500 transition-colors"
-                                                placeholder="000" type="text" />
-                                        </div>
-                                    </div>
-                                </div>
+
+
                             </div>
                         </div>
-                        <div class="w-full p-3">
-                            <label for="type2" class="flex items-center cursor-pointer">
-                                <input type="radio" class="form-radio h-5 w-5 text-red-500" name="type" id="type2">
-                                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" width="80"
-                                    class="ml-3" />
-                            </label>
-                        </div>
+
                     </div>
                     <div>
-                        <button
-                            class="block w-full max-w-xs mx-auto bg-red-500 hover:bg-red-700 focus:bg-red-700 text-white rounded-lg px-3 py-2 font-semibold"><i
-                                class="mdi mdi-lock-outline mr-1"></i> PAY NOW</button>
+                        <button @click="confirmpayment" class="block w-full max-w-xs mx-auto bg-red-500 hover:bg-red-700
+                             focus:bg-red-700 text-white rounded-lg px-3 py-2 font-semibold"><i
+                                class="mdi mdi-lock-outline mr-1"></i> Complete Order</button>
                     </div>
                 </div>
             </div>
+        </div>
+        <div v-else>
+            <!-- Show a message or redirect if the cart is empty -->
+            <p>Your cart is empty. <router-link to="/shop">Continue Shopping</router-link></p>
         </div>
     </div>
 </template>
 
 <script>
 export default {
-    name: 'CheckoutPage'
+    name: 'CheckoutPage',
+    props: {
+        cartData: {
+            type: Array,
+            default: () => [],
+
+        },
+
+    },
+    data() {
+        return {
+            localcartData: [],
+            userData: {
+                name: '',
+                email: '',
+                address: '',
+                phone: '',
+                location: '',
+            },
+            orderSubmitted: false,
+            phone: '',
+            amount: 0,
+        };
+    },
+    created() {
+        const cartDataJson = this.$route.query.cartData;
+        this.localcartData = cartDataJson ? JSON.parse(cartDataJson) : [];
+        console.log("Received cartItems:", this.localcartData);
+    },
+
+    computed: {
+
+        shippingFee() {
+
+            return 300;
+        },
+
+        cartTotal() {
+            if (!this.localcartData) {
+                return 0; // or handle this case appropriately
+            }
+
+            return this.localcartData.reduce((total, item) => {
+                return total + (item.quantity * (item.sale_price || item.price));
+            }, 0);
+        },
+    },
+    methods: {
+        formatCurrency(value) {
+            if (typeof value === 'number') {
+                // If the value is already a number, directly format it
+                return value.toLocaleString('en-KE', { style: 'currency', currency: 'KES' });
+            } else if (typeof value === 'string') {
+                // Attempt to parse the value as a float and format it
+                const numericValue = parseFloat(value);
+                return isNaN(numericValue) ? '-' : numericValue.toLocaleString('en-KE', { style: 'currency', currency: 'KES' });
+            } else {
+                // Handle other cases or return a default value
+                return '-';
+            }
+        },
+        makePayment() {
+            // Validate the phone number (you may need a more robust validation)
+            const phoneRegex = /^07\d{8}$/;
+            if (!phoneRegex.test(this.phone)) {
+                alert('Please enter a valid phone number');
+                return;
+            }
+
+            // Call your backend to initiate MPesa payment
+            // You'll need to implement this part on your server
+            // For example, using axios to send a request to your server endpoint
+            // axios.post('/api/mpesa/payment', { phone: this.phone, amount: this.amount })
+            //   .then(response => {
+            //     console.log(response.data);
+            //   })
+            //   .catch(error => {
+            //     console.error(error);
+            //   });
+        },
+
+    }
 }
 </script>
 <style scoped>
-@import url('https://cdnjs.cloudflare.com/ajax/libs/MaterialDesign-Webfont/5.3.45/css/materialdesignicons.min.css')
-
-/*
-module.exports = {
-    plugins: [require('@tailwindcss/forms'),]
-};
-*/
-.form-radio {
+@import url('https://cdnjs.cloudflare.com/ajax/libs/MaterialDesign-Webfont/5.3.45/css/materialdesignicons.min.css') .form-radio {
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
