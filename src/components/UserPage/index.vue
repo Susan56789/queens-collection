@@ -96,7 +96,7 @@
                                 </div>
                                 <div class="grid grid-cols-2">
                                     <div class="px-4 py-2 font-semibold">Birthday</div>
-                                    <div class="px-4 py-2">{{ localUserData.dob }}</div>
+                                    <div class="px-4 py-2"><small>{{ formatDate(localUserData.dob) }}</small></div>
                                 </div>
                             </div>
                         </div>
@@ -168,6 +168,35 @@ export default {
     },
 
     methods: {
+        formatDate(dob) {
+            const date = new Date(dob);
+            const dayOfMonth = date.getDate();
+            const month = date.toLocaleString('default', { month: 'long' });
+            const year = date.getFullYear();
+
+            // Get the ordinal suffix for the day
+            const daySuffix = this.getDaySuffix(dayOfMonth);
+
+            return `${dayOfMonth}${daySuffix} ${month} ${year}`;
+        },
+
+        getDaySuffix(day) {
+            if (day >= 11 && day <= 13) {
+                return 'th';
+            }
+
+            switch (day % 10) {
+                case 1:
+                    return 'st';
+                case 2:
+                    return 'nd';
+                case 3:
+                    return 'rd';
+                default:
+                    return 'th';
+            }
+        },
+
         async fetchUser() {
             try {
                 const userDataQueryParam = this.$route.query.userData;
