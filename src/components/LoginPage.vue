@@ -84,7 +84,7 @@ export default {
     methods: {
         async login() {
             try {
-                console.log('Sending login request with credentials:', this.credentials);
+
                 const response = await userService.login(this.credentials);
 
                 if (response.success) {
@@ -92,6 +92,9 @@ export default {
                     const userDataResponse = await userService.getUserDataByEmail(this.credentials.email);
 
                     if (userDataResponse.success) {
+                        // Save user data to local storage
+                        this.saveUserDataToLocalStorage(userDataResponse.data);
+
                         // Navigate to the user page and pass user data
                         this.$router.push({
                             name: 'UserPage',
@@ -108,6 +111,38 @@ export default {
                 console.error('Error during login:', error);
             }
         },
+
+        saveUserDataToLocalStorage(userData) {
+            // Save user data to local storage with an expiration time of 30 minutes
+            const expirationTime = new Date().getTime() + 30 * 60 * 1000;
+            const dataToSave = {
+                userData: userData,
+                expirationTime: expirationTime,
+            };
+            localStorage.setItem('userData', JSON.stringify(dataToSave));
+        },
+
+        getSavedUserDataFromLocalStorage() {
+            // Get user data from local storage
+            const savedData = localStorage.getItem('userData');
+
+            if (savedData) {
+                const parsedData = JSON.parse(savedData);
+
+                // Check if the data is still valid (not expired)
+                if (parsedData.expirationTime > new Date().getTime()) {
+                    return parsedData.userData;
+                } else {
+                    // Remove expired data from local storage
+                    localStorage.removeItem('userData');
+                }
+            }
+
+            return null;
+        },
+
+
+
     },
 };
 </script>

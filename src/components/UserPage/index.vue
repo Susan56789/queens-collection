@@ -31,7 +31,14 @@
                             <div class="mt-6 py-6 border-t border-slate-200 text-center">
                                 <div class="flex flex-wrap justify-center">
                                     <div class="w-full px-4">
-                                        <p class="font-light leading-relaxed text-slate-600 mb-4">My bio</p>
+                                        <button @click="logout" class="flex items-center hover:text-white-200">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                                xmlns="http://www.w3.org/2000/svg">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
+                                                </path>
+                                            </svg>
+                                        </button>
 
                                     </div>
                                 </div>
@@ -94,14 +101,7 @@
                             </div>
                         </div>
 
-                        <button @click="logout" class="flex items-center hover:text-white-200">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
-                                </path>
-                            </svg>
-                        </button>
+
                     </div>
                     <!-- End of about section -->
 
@@ -144,6 +144,9 @@
                 <!-- End of profile tab -->
             </div>
         </div>
+        <div v-else>
+            <p>Please <router-link to="/login" class="text-red-500 underline">login</router-link>.</p>
+        </div>
     </div>
 </template>
 
@@ -167,24 +170,43 @@ export default {
     methods: {
         async fetchUser() {
             try {
-                // If userData is provided as a query parameter, use it directly
                 const userDataQueryParam = this.$route.query.userData;
 
                 if (userDataQueryParam) {
-                    this.localUserData = JSON.parse(userDataQueryParam);
-                    console.log('fetchedUserData', this.localUserData)
+                    // Parse the query parameter string to JSON
+                    this.localUserData = JSON.parse(decodeURIComponent(userDataQueryParam));
+
+                    this.saveUserDataToLocalStorage();
                     return;
                 }
 
-                // Otherwise, fetch user data using the userService
-                const fetchedUserData = await userService.getUserData();
-                this.localUserData = fetchedUserData;
+                // Check if user data is stored in local storage and not expired
+                const storedUserData = localStorage.getItem('userData');
+                const storedTimestamp = localStorage.getItem('userDataTimestamp');
 
-                console.log('fetchedUserData', this.localUserData)
+                if (storedUserData && storedTimestamp && Date.now() - storedTimestamp < 30 * 60 * 1000) {
+                    this.localUserData = JSON.parse(storedUserData);
+
+                } else {
+                    // Otherwise, fetch user data using the userService
+                    const fetchedUserData = await userService.getUserData();
+                    this.localUserData = fetchedUserData;
+
+
+                    // Save user data to local storage with a timestamp
+                    this.saveUserDataToLocalStorage();
+                }
             } catch (error) {
                 console.error('Error fetching user data:', error);
             }
         },
+
+
+        saveUserDataToLocalStorage() {
+            localStorage.setItem('userData', JSON.stringify(this.localUserData));
+            localStorage.setItem('userDataTimestamp', Date.now());
+        },
+
         logout() {
             userService.logout();
             this.$router.push('/login'); // Redirect to login page after logout

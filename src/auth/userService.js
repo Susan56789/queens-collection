@@ -59,7 +59,7 @@ const getUserData = () => {
         withCredentials: true, // Include credentials if necessary
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`, // Adjust as needed
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
     })
         .then((response) => response.data)

@@ -67,6 +67,7 @@
   
 <script>
 import axios from 'axios';
+import userService from '@/auth/userService';
 
 export default {
     name: 'ShopPage',
@@ -75,6 +76,7 @@ export default {
             categories: [],
             selectedCategory: 1,
             categoryProducts: [],
+
         };
     },
     mounted() {
@@ -92,19 +94,69 @@ export default {
             this.selectedProduct = product;
             this.addToCart();
         },
-        addToCart() {
-            const product = this.selectedProduct;
+        async addToCart() {
+            try {
+                // Fetch user data and check if the user is logged in
+                const userData = await this.getUserDataAndCheckLogin();
 
-            if (product && product.product_id && product.price && product.quantity) {
-                axios.post('http://localhost:3000/api/addToCart', product)
-                    .then(response => {
-                        console.log(response.data);
-                    })
-                    .catch(error => {
-                        console.error(error);
-                    });
-            } else {
-                console.error('Invalid product data for cart:', product);
+                if (!userData) {
+                    // If not logged in, show an alert and redirect to the login page
+                    alert('Please sign up or log in to add items to your cart.');
+                    this.$router.push('/login');
+                    return;
+                }
+
+                const userId = userData;
+                const product = this.selectedProduct;
+                console.log('USER DATA CART PAGE:', userData)
+                // Check if the product data is valid
+                if (this.isValidProductData(product)) {
+                    // Proceed with adding the product to the cart
+                    await this.addToCartRequest(product, userId);
+                } else {
+                    // Provide feedback to the user about the invalid product data
+                    console.error('Invalid product data for cart:', product);
+                    alert('Invalid product data. Please select a valid product.');
+                }
+            } catch (error) {
+                console.error('Error during addToCart:', error);
+                // Handle errors and provide feedback to the user
+                alert('Error adding product to cart. Please try again.');
+            }
+        },
+
+        async getUserDataAndCheckLogin() {
+            try {
+                // Fetch user data from the userService
+                const userDataResponse = await userService.getUserData();
+                console.log("USER DATA IN USER SERVICE:", userDataResponse);
+
+                if (!userDataResponse || !userDataResponse.success || !userDataResponse.data.customer_id) {
+                    return null; // User not logged in
+                }
+
+                return userDataResponse.data;
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+                throw error; // Propagate the error to the calling function
+            }
+        },
+
+        isValidProductData(product) {
+            return product && product.product_id && product.price && product.quantity;
+        },
+
+        async addToCartRequest(product, userId) {
+            try {
+                const response = await axios.post('http://localhost:3000/api/addToCart', { product, userId });
+                console.log(response.data);
+                // Provide feedback to the user upon successful addition to the cart
+                alert('Product added to cart successfully!');
+            } catch (error) {
+                console.error(error);
+                // Handle errors and provide feedback to the user
+                alert('Error adding product to cart. Please try again.');
+                throw error; // Propagate the error to the calling function
             }
         },
 

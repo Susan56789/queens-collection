@@ -56,6 +56,8 @@
                     </router-link>
 
 
+
+
                 </div>
             </div>
 
@@ -108,8 +110,14 @@ export default {
     },
     computed: {
         isLoggedIn() {
+            // Check if the user is authenticated using userService.isAuthenticated()
+            if (userService.isAuthenticated()) {
+                return true;  // Return true if authenticated
+            }
 
-            return userService.isAuthenticated();
+            // If not authenticated using the service, check if user data is present in local storage
+            const userData = localStorage.getItem('userData');
+            return !!userData; // Returns true if userData is present, false otherwise
         },
     },
 }
