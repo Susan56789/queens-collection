@@ -67,7 +67,6 @@
   
 <script>
 import axios from 'axios';
-import userService from '@/auth/userService';
 
 export default {
     name: 'ShopPage',
@@ -96,23 +95,13 @@ export default {
         },
         async addToCart() {
             try {
-                // Fetch user data and check if the user is logged in
-                const userData = await this.getUserDataAndCheckLogin();
-
-                if (!userData) {
-                    // If not logged in, show an alert and redirect to the login page
-                    alert('Please sign up or log in to add items to your cart.');
-                    this.$router.push('/login');
-                    return;
-                }
-
-                const userId = userData;
+              
                 const product = this.selectedProduct;
-                console.log('USER DATA CART PAGE:', userData)
+               
                 // Check if the product data is valid
                 if (this.isValidProductData(product)) {
                     // Proceed with adding the product to the cart
-                    await this.addToCartRequest(product, userId);
+                    await this.addToCartRequest(product);
                 } else {
                     // Provide feedback to the user about the invalid product data
                     console.error('Invalid product data for cart:', product);
@@ -125,30 +114,15 @@ export default {
             }
         },
 
-        async getUserDataAndCheckLogin() {
-            try {
-                // Fetch user data from the userService
-                const userDataResponse = await userService.getUserData();
-                console.log("USER DATA IN USER SERVICE:", userDataResponse);
-
-                if (!userDataResponse || !userDataResponse.success || !userDataResponse.data.customer_id) {
-                    return null; // User not logged in
-                }
-
-                return userDataResponse.data;
-            } catch (error) {
-                console.error('Error fetching user data:', error);
-                throw error; // Propagate the error to the calling function
-            }
-        },
+        
 
         isValidProductData(product) {
             return product && product.product_id && product.price && product.quantity;
         },
 
-        async addToCartRequest(product, userId) {
+        async addToCartRequest(product) {
             try {
-                const response = await axios.post('http://localhost:3000/api/addToCart', { product, userId });
+                const response = await axios.post('http://localhost:3000/api/addToCart',  product );
                 console.log(response.data);
                 // Provide feedback to the user upon successful addition to the cart
                 alert('Product added to cart successfully!');

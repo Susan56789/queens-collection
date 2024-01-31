@@ -13,8 +13,6 @@ const port = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
 
-
-
 const client = new Client({
     user: 'postgres',
     host: 'localhost',

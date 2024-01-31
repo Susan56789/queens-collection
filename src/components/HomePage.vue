@@ -69,7 +69,7 @@
                         class="w-full max-w-sm mx-auto rounded-md shadow-md overflow-hidden">
                         <div class="flex items-end justify-end h-56 w-full bg-cover"
                             :style="{ backgroundImage: 'url(' + product.image_path + ')' }">
-                            <button
+                            <button @click="addToCartButton(product)"
                                 class="p-2 rounded-full bg-red-600 text-white mx-5 -mb-4 hover:bg-red-500 focus:outline-none focus:bg-red-500">
                                 <svg class="h-5 w-5" fill="none" stroke-linecap="round" stroke-linejoin="round"
                                     stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
@@ -106,7 +106,7 @@
                 text-white p-2 duration-100 hover:bg-green-700 rounded-full">
                                 SAVE<br />{{ formatCurrency(product.amountSaved) }}
                             </button>
-                            <button
+                            <button @click="addToCartButton(product)"
                                 class="p-2 rounded-full bg-red-600 text-white mx-5 -mb-4 hover:bg-red-500 focus:outline-none focus:bg-red-500">
                                 <svg class="h-5 w-5" fill="none" stroke-linecap="round" stroke-linejoin="round"
                                     stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
@@ -175,6 +175,52 @@ export default {
                 }
             });
         },
+        addToCartButton(product) {
+
+this.selectedProduct = product;
+this.addToCart();
+},
+async addToCart() {
+try {
+  
+    const product = this.selectedProduct;
+   
+    // Check if the product data is valid
+    if (this.isValidProductData(product)) {
+        // Proceed with adding the product to the cart
+        await this.addToCartRequest(product);
+    } else {
+        // Provide feedback to the user about the invalid product data
+        console.error('Invalid product data for cart:', product);
+        alert('Invalid product data. Please select a valid product.');
+    }
+} catch (error) {
+    console.error('Error during addToCart:', error);
+    // Handle errors and provide feedback to the user
+    alert('Error adding product to cart. Please try again.');
+}
+},
+
+
+
+isValidProductData(product) {
+return product && product.product_id && product.price && product.quantity;
+},
+
+async addToCartRequest(product) {
+try {
+    const response = await axios.post('http://localhost:3000/api/addToCart',  product );
+    console.log(response.data);
+    // Provide feedback to the user upon successful addition to the cart
+    alert('Product added to cart successfully!');
+} catch (error) {
+    console.error(error);
+    // Handle errors and provide feedback to the user
+    alert('Error adding product to cart. Please try again.');
+    throw error; // Propagate the error to the calling function
+}
+},
+
 
         formatCurrency(value) {
             const numericValue = parseFloat(value);
