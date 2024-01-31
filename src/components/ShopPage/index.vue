@@ -1,7 +1,7 @@
 <template>
     <section class="bg-white">
         <div class="container px-6 py-8 mx-auto">
-            <div class="lg:flex lg:-mx-2">
+            <div class="flex mx-2">
                 <div class="space-y-3 lg:w-1/5 lg:px-2 lg:space-y-4">
                     <a v-for="category in categories" :key="category.category_id" :class="{
                         'text-red-600 dark:text-red-500': selectedCategory === category.category_id,
