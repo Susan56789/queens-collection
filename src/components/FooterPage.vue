@@ -37,7 +37,7 @@
                              hover:text-white-400 hover:underline hover:text-white-500">
                             Contact Us
                         </a>
-                        <a href="#" class="text-white transition-colors duration-300 
+                        <a href="/on-sale" class="text-white transition-colors duration-300 
                            hover:text-white-400 hover:underline
                              hover:text-white-500">
                             On Sale Items

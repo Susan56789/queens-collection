@@ -45,7 +45,10 @@ const routes = [
                 path: '/admin',
                 component: () => import('./components/AdminDashboard/AdminLogin.vue')
             },
-
+            {
+                path: '/on-sale',
+                component: () => import('./components/OnSale/index.vue')
+            },
 
             {
                 path: '/privacy-policy',
