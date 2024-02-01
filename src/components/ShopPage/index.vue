@@ -13,7 +13,7 @@
 
                 <div v-if="selectedCategory !== null && categoryProducts.length > 0" class="mt-6 lg:mt-0 lg:px-2 lg:w-4/5">
                     <div class="flex items-center justify-between text-sm tracking-widest uppercase">
-                        <p class="text-black-500">{{ `${categoryProducts.length} Items` }}</p>
+                        <p class="text-black-500">{{ `${paginatedProducts.length} Items` }}</p>
                         <div class="flex items-center">
                             <p class="text-black-500">Sort</p>
                             <select
@@ -25,7 +25,7 @@
                         </div>
                     </div>
                     <div class="grid grid-cols-1 gap-8 mt-8 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                        <div v-for="product in categoryProducts" :key="product.product_id"
+                        <div v-for="product in paginatedProducts" :key="product.product_id"
                             class="flex flex-col items-center justify-center w-full max-w-lg mx-auto">
                             <img class="object-cover w-full rounded-md h-72 xl:h-80" :src="product.image_path"
                                 :alt="product.product_name" />
@@ -54,7 +54,7 @@
                         </div>
                     </div>
                     <div class="flex justify-center mt-30">
-                        <MainPagination :currentPage="currentPage" :totalPages="totalPages" :goToPage="goToPage">
+                        <MainPagination :currentPage="currentPage" :totalPages="totalPages" @goToPage="goToPage">
                         </MainPagination>
                     </div>
                 </div>
@@ -143,14 +143,10 @@ export default {
             }
         },
         goToPage(page) {
+
             if (page >= 1 && page <= this.totalPages) {
                 this.currentPage = page;
 
-                // Calculate the start and end indices for the current page
-                const startIndex = (page - 1) * this.productsPerPage;
-                const endIndex = Math.min(startIndex + this.productsPerPage, this.totalProducts);
-
-                this.fetchCategoryProducts(startIndex, endIndex);
             }
         },
         formatCurrency(value) {
@@ -186,8 +182,15 @@ export default {
         },
     },
     computed: {
+        paginatedProducts() {
+            const startIndex = (this.currentPage - 1) * this.productsPerPage;
+            const endIndex = startIndex + this.productsPerPage;
+
+            return (this.categoryProducts || []).slice(startIndex, endIndex);
+        },
         totalPages() {
-            return Math.ceil(this.totalProducts / this.productsPerPage);
+            const totalPages = Math.ceil((this.totalProducts || 0) / this.productsPerPage);
+            return totalPages > 0 ? totalPages : 1; // Ensure a minimum of 1 page
         },
     },
 

@@ -2,9 +2,22 @@
     <div class=" container mx-auto px-6">
         <div class="mt-16">
             <h3 class="text-gray-600 text-2xl font-medium">Today's Offer</h3>
+            <div class="flex items-center justify-between text-sm tracking-widest uppercase">
+                <p class="text-black-500">{{ `${paginatedProducts.length} Items` }}</p>
+                <div class="flex items-center">
+                    <p class="text-black-500">Sort</p>
+                    <select class="font-medium text-black-700 bg-transparent dark:text-black-500 focus:outline-none">
+                        <option value="#">Recommended</option>
+                        <option value="#">Size</option>
+                        <option value="#">Price</option>
+                    </select>
+                </div>
+            </div>
             <div class="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mt-6">
-                <div v-for="product  in productsOnSale" :key="product.product_id"
+
+                <div v-for="product in paginatedProducts" :key="product.product_id"
                     class="w-full max-w-sm mx-auto rounded-md shadow-md overflow-hidden relative">
+
                     <div class="flex items-end justify-end h-56 w-full bg-cover"
                         :style="{ backgroundImage: 'url(' + product.image_path + ')' }">
                         <button v-if="product.amountSaved > 0" class="save-button absolute top-0 right-0 bg-green-500 
@@ -36,7 +49,8 @@
             </div>
         </div>
         <div class="flex justify-center mt-30">
-            <MainPagination :currentPage="currentPage" :totalPages="totalPages" :goToPage="goToPage"></MainPagination>
+            <MainPagination :currentPage="currentPage" :totalPages="totalPages" @goToPage="goToPage">
+            </MainPagination>
         </div>
 
     </div>
@@ -57,25 +71,25 @@ export default {
             currentPage: 1,
             productsPerPage: 12,
             totalProducts: 0,
+            selectedProduct: null
         };
     },
     components: {
         MainPagination,
     },
     methods: {
-        async fetchProducts() {
+        async fetchProducts(startIndex, endIndex) {
             try {
                 const response = await axios.get('http://localhost:3000/api/products');
                 const products = response.data || [];
 
+
                 // Assuming products have a product_id field
                 const sortedProducts = [...products].sort((a, b) => b.product_id - a.product_id);
 
-                // Update this.products with the fetched and sorted products
-                this.products = sortedProducts;
-
-                this.totalProducts = this.products.length;
-
+                // Update this.products with the fetched and sorted products within the specified range
+                this.products = sortedProducts.slice(startIndex, endIndex);
+                this.totalProducts = sortedProducts.length;
                 // Calculate amount saved for each product
                 this.calculateAmountSavedForEachProduct();
             } catch (error) {
@@ -138,21 +152,13 @@ export default {
             }
         },
         goToPage(page) {
+
             if (page >= 1 && page <= this.totalPages) {
                 this.currentPage = page;
 
-                // Calculate the start and end indices for the current page
-                const startIndex = (page - 1) * this.productsPerPage;
-                const endIndex = Math.min(startIndex + this.productsPerPage, this.totalProducts);
-
-                // Fetch and update data for the new page based on the start and end indices
-                // You can use startIndex and endIndex to determine the range of products to display
-                // For example, fetch data for products from startIndex to endIndex
-
-
-                this.fetchProducts(startIndex, endIndex);
             }
         },
+
 
         formatCurrency(value) {
             const numericValue = parseFloat(value);
@@ -161,11 +167,16 @@ export default {
 
     },
     computed: {
-        totalPages() {
+        paginatedProducts() {
+            const startIndex = (this.currentPage - 1) * this.productsPerPage;
+            const endIndex = startIndex + this.productsPerPage;
 
-            return Math.ceil(this.totalProducts / this.productsPerPage);
+            return (this.products || []).slice(startIndex, endIndex);
         },
-
+        totalPages() {
+            const totalPages = Math.ceil((this.totalProducts || 0) / this.productsPerPage);
+            return totalPages > 0 ? totalPages : 1; // Ensure a minimum of 1 page
+        },
         productsOnSale() {
             return this.products.filter((product) => product.price > product.sale_price && product.sale_price > 0);
         },
@@ -180,6 +191,7 @@ export default {
     },
     mounted() {
         this.fetchProducts();
+
     },
 };
 </script>

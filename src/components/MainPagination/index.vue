@@ -30,9 +30,24 @@
 export default {
     name: 'MainPagination',
     props: {
-        currentPage: Number,
-        totalPages: Number,
-        goToPage: Function,
+        currentPage: {
+            type: Number,
+            required: true,
+        },
+        totalPages: {
+            type: Number,
+            required: true,
+        },
+    },
+    methods: {
+        goToPage(page) {
+            if (page >= 1 && page <= this.totalPages) {
+                this.$emit('goToPage', page);
+            } else {
+                console.warn('Invalid page number:', page);
+            }
+        },
+
     },
 };
 </script>
@@ -40,6 +55,7 @@ export default {
 <style scoped>
 nav {
     margin-top: 30px;
+    margin-bottom: 30px;
 }
 
 .pagination-link {
@@ -62,7 +78,7 @@ nav {
 }
 
 .pagination-link.active {
-    background-color: #da1818;
+    background-color: #dd0b0b;
     color: #ffffff;
 }
 </style>
