@@ -82,7 +82,7 @@ export default {
             selectedCategory: 1,
             categoryProducts: [],
             currentPage: 1,
-            productsPerPage: 10,
+            productsPerPage: 12,
             totalProducts: 0,
             selectedProduct: null
         };

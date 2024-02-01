@@ -55,7 +55,7 @@ export default {
             products: [],
             wishlist: [],
             currentPage: 1,
-            productsPerPage: 10,
+            productsPerPage: 12,
             totalProducts: 0,
         };
     },
