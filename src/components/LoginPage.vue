@@ -113,8 +113,8 @@ export default {
         },
 
         saveUserDataToLocalStorage(userData) {
-            // Save user data to local storage with an expiration time of 30 minutes
-            const expirationTime = new Date().getTime() + 30 * 60 * 1000;
+            // Save user data to local storage with an expiration time of 30 days
+            const expirationTime = new Date().getTime() + 30 * 24 * 60 * 60 * 1000; // 30 days in milliseconds
             const dataToSave = {
                 userData: userData,
                 expirationTime: expirationTime,

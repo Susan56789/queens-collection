@@ -3,10 +3,13 @@ const express = require('express');
 const { Client } = require('pg');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const dotenv = require('dotenv')
 const bcrypt = require('bcrypt');
-
-dotenv.config();
+const dotenv = require('dotenv');
+const path = require('path');
+const result = dotenv.config({ path: path.resolve(__dirname, '.env') });
+if (result.error) {
+    throw result.error;
+}
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -14,16 +17,16 @@ const port = process.env.PORT || 3000;
 app.use(bodyParser.json());
 
 const client = new Client({
-    user: 'postgres',
-    host: 'localhost',
-    database: 'queens',
-    password: 'admin',
-    port: 5432,
+    user: process.env.DB_USER,
+    host: process.env.DB_HOST,
+    database: process.env.DB_NAME,
+    password: process.env.DB_PASSWORD,
+    port: process.env.DB_PORT || 5432,
 });
 
 app.use(express.json());
 app.use(cors({
-    origin: 'http://localhost:8080', // Replace with the actual origin of your Vue.js app
+    origin: 'http://localhost:8080',
     credentials: true,
 }));
 
