@@ -35,6 +35,10 @@
                 </div>
             </div>
         </div>
+        <div class="flex justify-center mt-30">
+            <MainPagination :currentPage="currentPage" :totalPages="totalPages" :goToPage="goToPage"></MainPagination>
+        </div>
+
     </div>
 </template>
     
@@ -42,6 +46,7 @@
     
 <script>
 import axios from 'axios';
+import MainPagination from './../MainPagination/index'
 
 export default {
     name: 'OnOffer',
@@ -49,7 +54,13 @@ export default {
         return {
             products: [],
             wishlist: [],
+            currentPage: 1,
+            productsPerPage: 10,
+            totalProducts: 0,
         };
+    },
+    components: {
+        MainPagination,
     },
     methods: {
         async fetchProducts() {
@@ -62,6 +73,8 @@ export default {
 
                 // Update this.products with the fetched and sorted products
                 this.products = sortedProducts;
+
+                this.totalProducts = this.products.length;
 
                 // Calculate amount saved for each product
                 this.calculateAmountSavedForEachProduct();
@@ -107,8 +120,6 @@ export default {
             }
         },
 
-
-
         isValidProductData(product) {
             return product && product.product_id && product.price && product.quantity;
         },
@@ -126,7 +137,22 @@ export default {
                 throw error; // Propagate the error to the calling function
             }
         },
+        goToPage(page) {
+            if (page >= 1 && page <= this.totalPages) {
+                this.currentPage = page;
 
+                // Calculate the start and end indices for the current page
+                const startIndex = (page - 1) * this.productsPerPage;
+                const endIndex = Math.min(startIndex + this.productsPerPage, this.totalProducts);
+
+                // Fetch and update data for the new page based on the start and end indices
+                // You can use startIndex and endIndex to determine the range of products to display
+                // For example, fetch data for products from startIndex to endIndex
+
+
+                this.fetchProducts(startIndex, endIndex);
+            }
+        },
 
         formatCurrency(value) {
             const numericValue = parseFloat(value);
@@ -135,6 +161,11 @@ export default {
 
     },
     computed: {
+        totalPages() {
+
+            return Math.ceil(this.totalProducts / this.productsPerPage);
+        },
+
         productsOnSale() {
             return this.products.filter((product) => product.price > product.sale_price && product.sale_price > 0);
         },

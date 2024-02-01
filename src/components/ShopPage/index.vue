@@ -53,6 +53,10 @@
                             </button>
                         </div>
                     </div>
+                    <div class="flex justify-center mt-30">
+                        <MainPagination :currentPage="currentPage" :totalPages="totalPages" :goToPage="goToPage">
+                        </MainPagination>
+                    </div>
                 </div>
                 <div v-else class="mt-6 lg:mt-0 lg:px-2 lg:w-4/5">
                     <p v-if="selectedCategory !== null">
@@ -62,11 +66,13 @@
                 </div>
             </div>
         </div>
+
     </section>
 </template>
   
 <script>
 import axios from 'axios';
+import MainPagination from './../MainPagination/index'
 
 export default {
     name: 'ShopPage',
@@ -75,8 +81,14 @@ export default {
             categories: [],
             selectedCategory: 1,
             categoryProducts: [],
-
+            currentPage: 1,
+            productsPerPage: 10,
+            totalProducts: 0,
+            selectedProduct: null
         };
+    },
+    components: {
+        MainPagination,
     },
     mounted() {
         this.fetchCategories();
@@ -95,9 +107,9 @@ export default {
         },
         async addToCart() {
             try {
-              
+
                 const product = this.selectedProduct;
-               
+
                 // Check if the product data is valid
                 if (this.isValidProductData(product)) {
                     // Proceed with adding the product to the cart
@@ -113,16 +125,13 @@ export default {
                 alert('Error adding product to cart. Please try again.');
             }
         },
-
-        
-
         isValidProductData(product) {
             return product && product.product_id && product.price && product.quantity;
         },
 
         async addToCartRequest(product) {
             try {
-                const response = await axios.post('http://localhost:3000/api/addToCart',  product );
+                const response = await axios.post('http://localhost:3000/api/addToCart', product);
                 console.log(response.data);
                 // Provide feedback to the user upon successful addition to the cart
                 alert('Product added to cart successfully!');
@@ -133,7 +142,17 @@ export default {
                 throw error; // Propagate the error to the calling function
             }
         },
+        goToPage(page) {
+            if (page >= 1 && page <= this.totalPages) {
+                this.currentPage = page;
 
+                // Calculate the start and end indices for the current page
+                const startIndex = (page - 1) * this.productsPerPage;
+                const endIndex = Math.min(startIndex + this.productsPerPage, this.totalProducts);
+
+                this.fetchCategoryProducts(startIndex, endIndex);
+            }
+        },
         formatCurrency(value) {
             const numericValue = parseFloat(value);
             return isNaN(numericValue) ? '-' : numericValue.toLocaleString('en-KE', { style: 'currency', currency: 'KES' });
@@ -159,11 +178,17 @@ export default {
                     `http://localhost:3000/api/productsByCategory?categoryId=${this.selectedCategory}`
                 );
                 this.categoryProducts = response.data;
+
+                this.totalProducts = this.categoryProducts.length;
             } catch (error) {
                 console.error('Error fetching products', error);
             }
         },
-
+    },
+    computed: {
+        totalPages() {
+            return Math.ceil(this.totalProducts / this.productsPerPage);
+        },
     },
 
 };
