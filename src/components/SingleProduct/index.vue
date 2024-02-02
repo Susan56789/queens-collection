@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-col  justify-center h-screen">
+    <div class="flex flex-col  justify-center h-screen container mx-auto px-6 my-8">
         <BreadCrumbs />
         <div class="relative w-full flex flex-col md:flex-row md:space-x-5 space-y-3 md:space-y-0 rounded-xl
              shadow-lg p-3 max-w-xs md:max-w-3xl mx-auto border border-white bg-white">
@@ -46,12 +46,16 @@
                 </p>
             </div>
         </div>
+        <div>
+            <RelatedProducts :relatedProducts="relatedProducts" @add-to-cart="addToCart" />
+        </div>
     </div>
 </template>
 
 <script>
 import axios from 'axios';
 import BreadCrumbs from '../BreadCrumbs.vue';
+import RelatedProducts from '../RelatedProducts/index.vue'
 
 export default {
     name: 'SingleProduct',
@@ -70,19 +74,34 @@ export default {
             },
             categories: [],
             categoryName: '',
+            relatedProducts: [],
         }
     },
     components: {
-        BreadCrumbs
+        BreadCrumbs,
+        RelatedProducts
     },
     mounted() {
         this.fetchProductDetails();
         this.fetchCategories();
+        this.fetchRelatedProducts();
     },
     methods: {
         formatCurrency(value) {
             const numericValue = parseFloat(value);
             return isNaN(numericValue) ? '-' : numericValue.toLocaleString('en-KE', { style: 'currency', currency: 'KES' });
+        },
+        async fetchRelatedProducts() {
+            try {
+                const categoryId = this.selectedProduct.category_id;
+                console.log('CategoryID', categoryId)
+
+                // Adjust the URL and parameters as needed
+                const response = await axios.get(`http://localhost:3000/api/relatedProducts?categoryId=${categoryId}`);
+                this.relatedProducts = response.data;
+            } catch (error) {
+                console.error('Error fetching related products', error);
+            }
         },
         async fetchCategories() {
             try {
@@ -105,7 +124,7 @@ export default {
             }
         },
 
-        fetchProductDetails() {
+        async fetchProductDetails() {
             const product_Name = this.$route.params.name;
 
             if (!product_Name) {
@@ -116,16 +135,16 @@ export default {
             try {
                 const productName = decodeURIComponent(product_Name);
 
-                axios
-                    .get(`http://localhost:3000/api/product/${productName}`)
-                    .then((response) => {
-                        this.selectedProduct = response.data[0];
-                    })
-                    .catch((error) => {
-                        console.error(error);
-                    });
-            } catch (decodeError) {
-                console.error('Error decoding product name:', decodeError);
+                // Use async/await to wait for the HTTP request to complete
+                const response = await axios.get(`http://localhost:3000/api/product/${productName}`);
+
+                // Assuming response.data is an array of products, take the first one
+                this.selectedProduct = response.data[0];
+
+                // Call fetchRelatedProducts after setting this.selectedProduct
+                this.fetchRelatedProducts();
+            } catch (error) {
+                console.error('Error fetching product details:', error);
             }
         },
         addToCartButton(product) {
