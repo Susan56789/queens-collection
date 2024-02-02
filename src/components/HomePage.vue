@@ -80,7 +80,9 @@
                             </button>
                         </div>
                         <div class="px-5 py-3">
-                            <h3 class="text-gray-700 uppercase">{{ product.product_name }}</h3>
+                            <router-link :to="'/product/' + product.product_name">
+                                <h3 class="text-gray-700 uppercase">{{ product.product_name }}</h3>
+                            </router-link>
                             <p class="text-gray-500 mt-2">
                                 <span v-if="product.sale_price && product.sale_price > 0">
                                     {{ formatCurrency(product.sale_price) }}
@@ -117,7 +119,9 @@
                             </button>
                         </div>
                         <div class="px-5 py-3">
-                            <h3 class="text-gray-700 uppercase">{{ product.product_name }}</h3>
+                            <router-link :to="'/product/' + product.product_name">
+                                <h3 class="text-gray-700 uppercase">{{ product.product_name }}</h3>
+                            </router-link>
                             <p class="text-gray-500 mt-2">
                                 <span v-if="product.sale_price && product.sale_price > 0">
                                     {{ formatCurrency(product.sale_price) }}
@@ -177,49 +181,46 @@ export default {
         },
         addToCartButton(product) {
 
-this.selectedProduct = product;
-this.addToCart();
-},
-async addToCart() {
-try {
-  
-    const product = this.selectedProduct;
-   
-    // Check if the product data is valid
-    if (this.isValidProductData(product)) {
-        // Proceed with adding the product to the cart
-        await this.addToCartRequest(product);
-    } else {
-        // Provide feedback to the user about the invalid product data
-        console.error('Invalid product data for cart:', product);
-        alert('Invalid product data. Please select a valid product.');
-    }
-} catch (error) {
-    console.error('Error during addToCart:', error);
-    // Handle errors and provide feedback to the user
-    alert('Error adding product to cart. Please try again.');
-}
-},
+            this.selectedProduct = product;
+            this.addToCart();
+        },
+        async addToCart() {
+            try {
 
+                const product = this.selectedProduct;
 
+                // Check if the product data is valid
+                if (this.isValidProductData(product)) {
+                    // Proceed with adding the product to the cart
+                    await this.addToCartRequest(product);
+                } else {
+                    // Provide feedback to the user about the invalid product data
+                    console.error('Invalid product data for cart:', product);
+                    alert('Invalid product data. Please select a valid product.');
+                }
+            } catch (error) {
+                console.error('Error during addToCart:', error);
+                // Handle errors and provide feedback to the user
+                alert('Error adding product to cart. Please try again.');
+            }
+        },
+        isValidProductData(product) {
+            return product && product.product_id && product.price && product.quantity;
+        },
 
-isValidProductData(product) {
-return product && product.product_id && product.price && product.quantity;
-},
-
-async addToCartRequest(product) {
-try {
-    const response = await axios.post('http://localhost:3000/api/addToCart',  product );
-    console.log(response.data);
-    // Provide feedback to the user upon successful addition to the cart
-    alert('Product added to cart successfully!');
-} catch (error) {
-    console.error(error);
-    // Handle errors and provide feedback to the user
-    alert('Error adding product to cart. Please try again.');
-    throw error; // Propagate the error to the calling function
-}
-},
+        async addToCartRequest(product) {
+            try {
+                const response = await axios.post('http://localhost:3000/api/addToCart', product);
+                console.log(response.data);
+                // Provide feedback to the user upon successful addition to the cart
+                alert('Product added to cart successfully!');
+            } catch (error) {
+                console.error(error);
+                // Handle errors and provide feedback to the user
+                alert('Error adding product to cart. Please try again.');
+                throw error; // Propagate the error to the calling function
+            }
+        },
 
 
         formatCurrency(value) {
@@ -230,14 +231,20 @@ try {
     },
     computed: {
         productsOnSale() {
-            return this.products.filter((product) => product.price > product.sale_price && product.sale_price > 0);
-        },
+            // Filter products on sale
+            const onSaleProducts = this.products.filter((product) => product.price > product.sale_price && product.sale_price > 0);
 
+            // Sort the on-sale products by creation date (assuming there is a createdAt property)
+            const sortedProducts = onSaleProducts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+            // Display the latest 8 products
+            return sortedProducts.slice(0, 8);
+
+
+        },
         allProducts() {
 
             const sortedProducts = [...this.products].sort((a, b) => b.product_id - a.product_id);
-
-
             return sortedProducts.slice(0, 8);
         },
     },

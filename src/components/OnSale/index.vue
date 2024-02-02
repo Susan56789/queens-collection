@@ -35,7 +35,9 @@
                         </button>
                     </div>
                     <div class="px-5 py-3">
-                        <h3 class="text-gray-700 uppercase">{{ product.product_name }}</h3>
+                        <router-link :to="'/product/' + product.product_name">
+                            <h3 class="text-gray-700 uppercase">{{ product.product_name }}</h3>
+                        </router-link>
                         <p class="text-gray-500 mt-2">
                             <span v-if="product.sale_price && product.sale_price > 0">
                                 {{ formatCurrency(product.sale_price) }}

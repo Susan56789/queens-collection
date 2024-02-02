@@ -27,11 +27,13 @@
                     <div class="grid grid-cols-1 gap-8 mt-8 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                         <div v-for="product in paginatedProducts" :key="product.product_id"
                             class="flex flex-col items-center justify-center w-full max-w-lg mx-auto">
-                            <img class="object-cover w-full rounded-md h-72 xl:h-80" :src="product.image_path"
-                                :alt="product.product_name" />
-                            <h4 class="mt-2 text-lg font-medium text-black-700 dark:text-black-200">
-                                {{ product.product_name }}
-                            </h4>
+                            <router-link :to="'/product/' + product.product_name">
+                                <img class="object-cover w-full rounded-md h-72 xl:h-80" :src="product.image_path"
+                                    :alt="product.product_name" />
+                                <h4 class="mt-2 text-lg font-medium text-black-700 dark:text-black-200">
+                                    {{ product.product_name }}
+                                </h4>
+                            </router-link>
                             <p class="text-red-500">
                                 <span v-if="product.sale_price && product.sale_price > 0">
                                     {{ formatCurrency(product.sale_price) }}

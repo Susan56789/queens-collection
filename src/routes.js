@@ -72,9 +72,15 @@ const routes = [
                 path: '/thank-you',
                 component: () => import('./components/ThankyouPage/index.vue')
             },
+            // {
+            //     path: '/product/:id',
+            //     component: () => import('./components/SingleProduct/index.vue')
+            // },
             {
-                path: '/product/:id',
-                component: () => import('./components/SingleProduct/index.vue')
+                path: "/product/:name",
+                component: () => import("./components/SingleProduct/index.vue"),
+                props: true,
+                name: 'SingleProduct',
             },
             {
                 path: '/category/:id',

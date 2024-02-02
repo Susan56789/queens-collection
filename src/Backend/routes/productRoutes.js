@@ -14,6 +14,22 @@ module.exports = (app, client) => {
         }
     });
 
+    //Endpoint to fetch selected product
+    app.get('/api/product/:productName', async (req, res) => {
+        const { productName } = req.params;
+        const query = 'SELECT * FROM products WHERE product_name = $1';
+
+        client.query(query, [productName], (error, results) => {
+            if (error) {
+                console.error('Error executing query:', error);
+                res.status(500).json({ error: 'Internal Server Error' });
+                return;
+            }
+
+            res.json(results.rows);
+        });
+    });
+
 
 
     // Endpoint to get products by category
