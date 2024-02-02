@@ -1,6 +1,7 @@
 <template>
     <section class="bg-white">
         <div class="container px-6 py-8 mx-auto">
+            <BreadCrumbs />
             <div class="flex mx-2">
                 <div class="space-y-3 lg:w-1/5 lg:px-2 lg:space-y-4">
                     <a v-for="category in categories" :key="category.category_id" :class="{
@@ -75,7 +76,7 @@
 <script>
 import axios from 'axios';
 import MainPagination from './../MainPagination/index'
-
+import BreadCrumbs from '../BreadCrumbs.vue';
 export default {
     name: 'ShopPage',
     data() {
@@ -91,6 +92,7 @@ export default {
     },
     components: {
         MainPagination,
+        BreadCrumbs
     },
     mounted() {
         this.fetchCategories();

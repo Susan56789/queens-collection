@@ -1,5 +1,6 @@
 <template>
     <div class="container flex flex-col mx-auto bg-white">
+        <BreadCrumbs />
         <div class="w-full draggable">
             <div class="container flex flex-col items-center gap-16 mx-auto my-32">
                 <div class="grid w-full grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
@@ -76,7 +77,12 @@
 </template>
 
 <script>
+import BreadCrumbs from './BreadCrumbs.vue';
+
 export default {
-    name: 'ContactUs'
+    name: 'ContactUs',
+    components: {
+        BreadCrumbs
+    }
 }
 </script>

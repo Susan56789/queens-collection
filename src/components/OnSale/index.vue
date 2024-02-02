@@ -1,5 +1,6 @@
 <template>
     <div class=" container mx-auto px-6">
+        <BreadCrumbs />
         <div class="mt-16">
             <h3 class="text-gray-600 text-2xl font-medium">Today's Offer</h3>
             <div class="flex items-center justify-between text-sm tracking-widest uppercase">
@@ -63,6 +64,7 @@
 <script>
 import axios from 'axios';
 import MainPagination from './../MainPagination/index'
+import BreadCrumbs from '../BreadCrumbs.vue';
 
 export default {
     name: 'OnOffer',
@@ -78,6 +80,7 @@ export default {
     },
     components: {
         MainPagination,
+        BreadCrumbs
     },
     methods: {
         async fetchProducts(startIndex, endIndex) {

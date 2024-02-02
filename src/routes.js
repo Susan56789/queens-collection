@@ -10,19 +10,23 @@ const routes = [
         children: [
             {
                 path: '',
-                component: () => import('./components/HomePage.vue')
+                component: () => import('./components/HomePage.vue'),
+                meta: { breadcrumb: 'Home' }
             },
             {
                 path: '/about',
-                component: () => import('./components/AboutUs.vue')
+                component: () => import('./components/AboutUs.vue'),
+                meta: { breadcrumb: 'About Us' }
             },
             {
                 path: '/contact',
-                component: () => import('./components/ContactUs.vue')
+                component: () => import('./components/ContactUs.vue'),
+                meta: { breadcrumb: 'Contact us' }
             },
             {
                 path: '/shop',
-                component: () => import('./components/ShopPage/index.vue')
+                component: () => import('./components/ShopPage/index.vue'),
+                meta: { breadcrumb: 'Shop' }
             },
             {
                 path: '/login',
@@ -31,7 +35,8 @@ const routes = [
 
             {
                 path: '/faqs',
-                component: () => import('./components/FaqsPage.vue')
+                component: () => import('./components/FaqsPage.vue'),
+                meta: { breadcrumb: 'FAQS' }
             },
             {
                 path: '/password-reset',
@@ -47,7 +52,8 @@ const routes = [
             },
             {
                 path: '/on-sale',
-                component: () => import('./components/OnSale/index.vue')
+                component: () => import('./components/OnSale/index.vue'),
+                meta: { breadcrumb: 'On-sale' }
             },
 
             {
@@ -56,17 +62,20 @@ const routes = [
             },
             {
                 path: '/cart',
-                component: () => import('./components/CartPage/index.vue')
+                component: () => import('./components/CartPage/index.vue'),
+                meta: { breadcrumb: 'Cart' }
             },
             {
                 path: '/wishlist',
-                component: () => import('./components/WishList/index.vue')
+                component: () => import('./components/WishList/index.vue'),
+                meta: { breadcrumb: 'Wishlist' }
             },
             {
                 path: '/checkout',
                 component: () => import('./components/CheckoutPage/index.vue'),
                 name: 'CheckoutPage',
-                props: true
+                props: true,
+                meta: { breadcrumb: 'Checkout' }
             },
             {
                 path: '/thank-you',
@@ -81,10 +90,12 @@ const routes = [
                 component: () => import("./components/SingleProduct/index.vue"),
                 props: true,
                 name: 'SingleProduct',
+                meta: { breadcrumb: ':name' }
             },
             {
-                path: '/category/:id',
-                component: () => import('./components/SelectedCategory/index.vue')
+                path: '/category/:name',
+                component: () => import('./components/SelectedCategory/index.vue'),
+                meta: { breadcrumb: ':name' }
             },
             // Customers Route
             {
