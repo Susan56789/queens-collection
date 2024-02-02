@@ -9,8 +9,11 @@
                     <img :src="relatedProduct.image_path" :alt="relatedProduct.product_name"
                         class="w-full h-40 object-cover">
                     <div class="p-4">
-                        <h3 class="text-gray-800 font-bold text-lg mb-2">{{ relatedProduct.product_name }}</h3>
-                        <p class="text-gray-600">{{ relatedProduct.description }}</p>
+                        <router-link :to="'/product/' + relatedProduct.product_name">
+                            <h3 class="text-gray-800 font-bold text-lg mb-2">{{ relatedProduct.product_name }}</h3>
+
+                        </router-link>
+
                         <p class="text-xl font-bold text-gray-800 mt-2">
                             {{ formatCurrency(relatedProduct.price) }}
                         </p>
