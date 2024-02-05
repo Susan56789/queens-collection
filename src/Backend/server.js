@@ -45,6 +45,7 @@ require('./routes/productRoutes')(app, client);
 require('./routes/cartRoutes')(app, client);
 require('./routes/categoryRoutes')(app, client);
 require('./routes/customerRoutes')(app, client);
+require('./routes/wishlistRoutes')(app, client);
 
 
 // User registration

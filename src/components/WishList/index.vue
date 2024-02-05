@@ -8,14 +8,14 @@
                 <ul v-if="wishlistItems.length > 0" class="space-y-4">
                     <li v-for="(item, index) in wishlistItems" :key="index" class="flex items-center justify-between">
                         <div class="flex items-center">
-                            <router-link :to="'/product/' + item.ProductName">
-                                <img :src="item.ImagePath" :alt="item.ProductName" class="h-16 w-16 object-cover mr-4" />
+                            <router-link :to="'/product/' + item.product_name">
+                                <img :src="item.image_path" :alt="item.product_name" class="h-30 w-30 object-cover mr-4" />
                             </router-link>
                             <div>
-                                <router-link :to="'/product/' + item.ProductName">
-                                    <p class="text-lg">{{ item.ProductName }}</p>
+                                <router-link :to="'/product/' + item.product_name">
+                                    <p class="text-lg">{{ item.product_name }}</p>
                                 </router-link>
-                                <p class="text-lg">KES. {{ formatNumber(item.DiscountedPrice || item.Price) }}</p>
+                                <p class="text-lg">KES. {{ formatCurrency(item.sale_price || item.price) }}</p>
                             </div>
                         </div>
                         <div class="flex items-center">
@@ -45,15 +45,15 @@ export default {
         BreadCrumbs
     },
     methods: {
-        formatNumber(value) {
-            return value.toLocaleString();
+        formatCurrency(value) {
+            const numericValue = parseFloat(value);
+            return isNaN(numericValue) ? '-' : numericValue.toLocaleString('en-KE', { style: 'currency', currency: 'KES' });
         },
         fetchWishlistItems() {
-
-            axios.get('http://localhost:3000/api/getWishlistItems')
+            axios.get('http://localhost:3000/api/allWishlistItems')
                 .then(response => {
                     this.wishlistItems = response.data;
-                    console.log(response.data)
+                    console.log(response.data);
                 })
                 .catch(error => {
                     console.error(error);
@@ -63,12 +63,11 @@ export default {
 
             if (index >= 0 && index < this.wishlistItems.length) {
                 const product = this.wishlistItems[index];
-
-
-                if (product && product.ProductName && product.Price) {
+                if (product && product.product_name && product.Price) {
                     axios.post('http://localhost:3000/api/addToCart', product)
                         .then(response => {
-                            console.log(response.data);
+                            console.log('post successful');
+                            return response;
                         })
                         .catch(error => {
                             console.error(error);
@@ -81,18 +80,35 @@ export default {
             }
         },
         removeFromWishlist(index) {
+            // Check if the index is valid
+            if (index >= 0 && index < this.wishlistItems.length) {
+                const item = this.wishlistItems[index];
 
-            const itemId = this.wishlistItems[index].id;
-            axios.delete(`http://localhost:3000/api/removeFromWishlist/${itemId}`)
-                .then(response => {
-                    console.log(response.data);
+                // Check if the item is an object and has the product_id property
+                if (item && typeof item === 'object' && 'product_id' in item) {
+                    const itemId = item.wishlist_id;
+                    axios.delete(`http://localhost:3000/api/removeFromWishlist/${itemId}`)
+                        .then(response => {
+                            console.log(response.data);
 
-                    this.wishlistItems.splice(index, 1);
-                })
-                .catch(error => {
-                    console.error(error);
-                });
+                            // Remove the item from the wishlistItems array
+                            this.wishlistItems.splice(index, 1);
+                        })
+                        .catch(error => {
+                            console.error(error);
+                        });
+                } else {
+                    console.error('Invalid item or missing product_id:', item);
+                }
+            } else {
+                console.error('Invalid index:', index);
+            }
         },
+
+
+
+
+
     },
     created() {
         this.fetchWishlistItems();

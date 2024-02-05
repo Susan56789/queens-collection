@@ -1,7 +1,7 @@
 <template>
     <div class="flex flex-col  justify-center container mx-auto px-6 my-8">
         <BreadCrumbs />
-        <div class="relative w-full flex flex-col md:flex-row md:space-x-5 space-y-3 md:space-y-0 rounded-xl
+        <div v-if="selectedProduct" class="relative w-full flex flex-col md:flex-row md:space-x-5 space-y-3 md:space-y-0 rounded-xl
              shadow-lg p-3 w-full mx-auto border border-white bg-white mb-5">
 
             <div class="w-full bg-white grid place-items-center">
@@ -12,14 +12,14 @@
                 <div class="flex justify-between item-center">
                     <p class="text-gray-500 font-medium hidden md:block">{{ categoryName }}</p>
 
-                    <div class="">
+                    <button @click="addToWishlistButton(product)">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-pink-500" viewBox="0 0 20 20"
                             fill="currentColor">
                             <path fill-rule="evenodd"
                                 d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
                                 clip-rule="evenodd" />
                         </svg>
-                    </div>
+                    </button>
 
                 </div>
                 <h3 class="font-black text-gray-800 md:text-3xl text-xl">{{ selectedProduct.product_name }}</h3>
@@ -94,8 +94,12 @@ export default {
         },
         async fetchRelatedProducts() {
             try {
-                const categoryId = this.selectedProduct.category_id;
-                console.log('CategoryID', categoryId)
+                const categoryId = await this.selectedProduct.category_id;
+
+                // Check if categoryId is valid before making the request
+                if (!categoryId || isNaN(categoryId) || categoryId <= 0) {
+                    return;
+                }
 
                 // Adjust the URL and parameters as needed
                 const response = await axios.get(`http://localhost:3000/api/relatedProducts?categoryId=${categoryId}`);
@@ -104,6 +108,7 @@ export default {
                 console.error('Error fetching related products', error);
             }
         },
+
         async fetchCategories() {
             try {
                 const response = await axios.get('http://localhost:3000/api/categories');
@@ -141,16 +146,17 @@ export default {
 
                 // Assuming response.data is an array of products, take the first one
                 this.selectedProduct = response.data[0];
-
                 // Call fetchRelatedProducts after setting this.selectedProduct
                 this.fetchRelatedProducts();
+
+                return Promise.resolve(); // Resolve the promise when product details are fetched
             } catch (error) {
                 console.error('Error fetching product details:', error);
             }
         },
-        addToCartButton(product) {
+        async addToCartButton(product) {
             product = this.selectedProduct;
-            this.addToCart(product);
+            await this.addToCart(product);
         },
         async addToCart() {
             try {
@@ -187,6 +193,28 @@ export default {
                 // Handle errors and provide feedback to the user
                 alert('Error adding product to cart. Please try again.');
                 throw error; // Propagate the error to the calling function
+            }
+        },
+        async addToWishlistButton(product) {
+            product = this.selectedProduct
+            await this.addToWishlist(product);
+        },
+
+        async addToWishlist() {
+            try {
+                const product = this.selectedProduct;
+
+                if (product?.product_name && product?.price && product?.image_path) {
+                    const response = await axios.post('http://localhost:3000/api/addToWishlist', product);
+                    const insertedProductData = response.data;
+                    console.log('Inserted Product Data:', insertedProductData);
+                } else {
+                    console.error('Invalid product data for wishlist:', product);
+                }
+            } catch (error) {
+                console.error('Error adding to wishlist:', error);
+                // Handle the error and update the UI as needed
+                // ...
             }
         },
 

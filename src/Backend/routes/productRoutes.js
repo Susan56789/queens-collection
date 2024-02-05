@@ -30,27 +30,28 @@ module.exports = (app, client) => {
         });
     });
 
-    //fETCH RELATED PRODUCTS
     app.get('/api/relatedProducts', async (req, res) => {
         try {
-            const categoryId = parseInt(req.query.categoryId, 10); // Parse categoryId to an integer
+            const categoryId = parseInt(req.query.categoryId);
 
-            if (isNaN(categoryId)) {
-                // Handle the case where categoryId is not a valid number
-                console.error('Invalid categoryId:', categoryId);
+            if (isNaN(categoryId) || categoryId <= 0) {
+                // Handle the case where categoryId is not a valid positive number
+                console.error('Invalid categoryId:', req.query.categoryId);
                 return res.status(400).json({ error: 'Invalid categoryId' });
             }
+
             const result = await client.query('SELECT * FROM products WHERE category_id = $1 LIMIT 3', [categoryId]);
             const relatedProducts = result.rows;
 
-
-
             res.json(relatedProducts);
         } catch (error) {
-            console.error('Error fetching related products', error);
+            console.error('Error fetching related products:', error.message);
+            console.error(error);
             res.status(500).send('Internal Server Error');
         }
     });
+
+
 
     // Endpoint to get products by category
     app.get('/api/productsByCategory', async (req, res) => {

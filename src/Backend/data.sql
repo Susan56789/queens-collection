@@ -19,6 +19,13 @@ INSERT INTO category (category_name) VALUES
 	('Ladies Shoes'),
     ('Home and Kitchen');
 	
+	UPDATE products
+SET category_id = 13
+WHERE category_id = 3;
+
+DELETE FROM category
+WHERE category_id = 3;
+	
 select * from category;
 
 CREATE TABLE products (
@@ -99,10 +106,15 @@ CREATE TABLE order_items (
 
 CREATE TABLE wishlist (
     wishlist_id SERIAL PRIMARY KEY,
-    customer_id INT REFERENCES customers(customer_id),
+    customer_id INT,
+    product_name VARCHAR(255),
+    price NUMERIC,
+	sale_price NUMERIC,
+	image_path VARCHAR(255),
     product_id INT REFERENCES products(product_id),
     added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
 
 CREATE TABLE shop_admin (
     admin_id SERIAL PRIMARY KEY,
