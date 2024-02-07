@@ -130,11 +130,11 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr class="">
+                                <tr v-for="(order, index) in ordersList" :key="index" class="">
                                     <td class="hover:bg-gray-100 cursor-pointer py-2 px-4 border-b">
-                                        <a href="#">Order1</a>
+                                        <a href="#">{{ order.order_id }}</a>
                                     </td>
-                                    <td class="py-2 px-4 border-b">March 2020</td>
+                                    <td class="py-2 px-4 border-b">{{ formatDate(order.order_date) }}</td>
                                     <td class="py-2 px-4 border-b">Pending</td>
                                 </tr>
 
@@ -162,11 +162,13 @@ export default {
     data() {
         return {
             localUserData: null,
+            ordersList: [],
         };
     },
 
     async created() {
         await this.fetchUser();
+        await this.fetchOrders();
     },
 
     methods: {
@@ -226,16 +228,40 @@ export default {
 
                     // Save user data to local storage with a timestamp
                     this.saveUserDataToLocalStorage();
+
+                    await this.fetchOrders(this.localUserData.email); // Fetch orders after user data is obtained
                 }
             } catch (error) {
                 console.error('Error fetching user data:', error);
             }
         },
-
-
         saveUserDataToLocalStorage() {
             localStorage.setItem('userData', JSON.stringify(this.localUserData));
             localStorage.setItem('userDataTimestamp', Date.now());
+        },
+        async fetchOrders(email) {
+            email = this.localUserData.email
+            try {
+                const response = await fetch(`http://localhost:3000/api/orders/email/${email}`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch orders');
+                }
+                const orders = await response.json();
+
+                // Sort orders by product_id in descending order
+                const sortedOrders = orders.sort((a, b) => b.order_id - a.order_id);
+
+                // Select the latest 10 orders
+                const latestOrders = sortedOrders.slice(0, 10);
+
+                // Assign latest orders to the ordersList data property
+                this.ordersList = latestOrders;
+
+                console.log('Fetched orders:', latestOrders);
+            } catch (error) {
+                console.error('Error fetching orders:', error);
+                // Handle error, e.g., show a notification to the user
+            }
         },
 
         logout() {
