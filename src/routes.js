@@ -79,12 +79,11 @@ const routes = [
             },
             {
                 path: '/thank-you',
-                component: () => import('./components/ThankyouPage/index.vue')
+                component: () => import('./components/ThankyouPage/index.vue'),
+                props: true,
+                name: 'ThankYou',
+                meta: { breadcrumb: 'Thank-you' }
             },
-            // {
-            //     path: '/product/:id',
-            //     component: () => import('./components/SingleProduct/index.vue')
-            // },
             {
                 path: "/product/:name",
                 component: () => import("./components/SingleProduct/index.vue"),

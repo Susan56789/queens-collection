@@ -27,8 +27,11 @@
                                 <p class="text-gray-400">x {{ product.quantity }}</p>
                             </div>
                             <div>
-                                <span class="font-semibold text-gray-600 text-xl">{{ formatCurrency(product.price)
-                                }}</span><span class="font-semibold text-gray-600 text-sm">.00</span>
+                                <span v-if="product.sale_price > 0" class="font-semibold text-gray-600 text-xl">
+                                    {{ formatCurrency(product.sale_price) }}
+                                </span>
+                                <span v-else class="font-semibold text-gray-600 text-xl">{{
+                                    formatCurrency(product.price) }}</span>
                             </div>
                         </div>
                     </div>
@@ -54,7 +57,8 @@
                                 <span class="text-gray-600">Subtotal</span>
                             </div>
                             <div class="pl-3">
-                                <span class="font-semibold">{{ formatCurrency(cartTotal + shippingFee) }}</span>
+                                <span class="font-semibold">{{ formatCurrency(cartTotal()) }}</span>
+
                             </div>
                         </div>
                         <div class="w-full flex items-center">
@@ -62,7 +66,15 @@
                                 <span class="text-gray-600">16% VAT</span>
                             </div>
                             <div class="pl-3">
-                                <span class="font-semibold">{{ formatCurrency(cartTotal - (cartTotal * 0.96)) }}</span>
+                                <span class="font-semibold">{{ formatCurrency(cartTotal() * 0.16) }}</span>
+                            </div>
+                        </div>
+                        <div class="w-full flex items-center">
+                            <div class="flex-grow">
+                                <span class="text-gray-600">Shipping Fee</span>
+                            </div>
+                            <div class="pl-3">
+                                <span class="font-semibold">{{ formatCurrency(shippingFee) }}</span>
                             </div>
                         </div>
                     </div>
@@ -72,7 +84,8 @@
                                 <span class="text-gray-600">Total</span>
                             </div>
                             <div class="pl-3">
-                                <span class="font-semibold">{{ formatCurrency(cartTotal) }}</span>
+                                <span class="font-semibold">{{ formatCurrency(cartTotal() + shippingFee) }}
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -98,19 +111,19 @@
                             <!-- Add more fields as needed (address, phone, location) -->
                             <div class="form-group mb-4">
                                 <label for="address" class="block text-sm font-medium text-gray-700">Address:</label>
-                                <input type="text" id="address" v-model="userData.address"
+                                <input type="text" id="address" v-model="userData.address" required
                                     class="mt-1 p-2 w-full border rounded-md" />
                             </div>
 
                             <div class="form-group mb-4">
                                 <label for="phone" class="block text-sm font-medium text-gray-700">Phone:</label>
-                                <input type="text" id="phone" v-model="userData.phone"
+                                <input type="text" id="phone" v-model="userData.phone" required
                                     class="mt-1 p-2 w-full border rounded-md" />
                             </div>
 
                             <div class="form-group mb-4">
                                 <label for="location" class="block text-sm font-medium text-gray-700">Location:</label>
-                                <input type="text" id="location" v-model="userData.location"
+                                <input type="text" id="location" v-model="userData.location" required
                                     class="mt-1 p-2 w-full border rounded-md" />
                             </div>
                         </form>
@@ -160,6 +173,8 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
     name: 'CheckoutPage',
     props: {
@@ -188,61 +203,144 @@ export default {
     created() {
         const cartDataJson = this.$route.query.cartData;
         this.localcartData = cartDataJson ? JSON.parse(cartDataJson) : [];
-        console.log("Received cartItems:", this.localcartData);
+
     },
 
     computed: {
 
         shippingFee() {
+            const baseShippingFee = 300;
+            return baseShippingFee;
+        }
 
-            return 300;
-        },
-
-        cartTotal() {
-            if (!this.localcartData) {
-                return 0; // or handle this case appropriately
-            }
-
-            return this.localcartData.reduce((total, item) => {
-                return total + (item.quantity * (item.sale_price || item.price));
-            }, 0);
-        },
     },
     methods: {
-        formatCurrency(value) {
-            if (typeof value === 'number') {
-                // If the value is already a number, directly format it
-                return value.toLocaleString('en-KE', { style: 'currency', currency: 'KES' });
-            } else if (typeof value === 'string') {
-                // Attempt to parse the value as a float and format it
-                const numericValue = parseFloat(value);
-                return isNaN(numericValue) ? '-' : numericValue.toLocaleString('en-KE', { style: 'currency', currency: 'KES' });
-            } else {
-                // Handle other cases or return a default value
-                return '-';
+        cartTotal() {
+            try {
+
+                const cartData = this.localcartData;
+                let totalAmount = 0;
+                cartData.forEach(item => {
+                    const itemPrice = parseFloat(item.sale_price || item.price);
+                    const itemQuantity = parseInt(item.quantity);
+                    if (!isNaN(itemPrice) && !isNaN(itemQuantity)) {
+                        totalAmount += itemPrice * itemQuantity;
+                    } else {
+                        console.error('Invalid item price or quantity:', item);
+                    }
+                });
+                this.amount = totalAmount + this.shippingFee;
+
+                return totalAmount;
+            } catch (error) {
+                console.error('Error fetching cart data:', error);
+                return 0;
             }
         },
+
+        formatCurrency(value) {
+            const numericValue = parseFloat(value);
+            return isNaN(numericValue) ? '-' : numericValue.toLocaleString('en-KE', { style: 'currency', currency: 'KES' });
+        },
         makePayment() {
-            // Validate the phone number (you may need a more robust validation)
+            const amount = this.cartTotal;
             const phoneRegex = /^07\d{8}$/;
             if (!phoneRegex.test(this.phone)) {
                 alert('Please enter a valid phone number');
                 return;
             }
+            const paymentData = {
+                phone: this.phone,
+                amount: amount,
+                status: 'pending'
+            };
 
-            // Call your backend to initiate MPesa payment
-            // You'll need to implement this part on your server
-            // For example, using axios to send a request to your server endpoint
-            // axios.post('/api/mpesa/payment', { phone: this.phone, amount: this.amount })
-            //   .then(response => {
-            //     console.log(response.data);
-            //   })
-            //   .catch(error => {
-            //     console.error(error);
-            //   });
+            axios.post('http://localhost:3000/api/mpesa/payment', paymentData)
+                .then(response => {
+                    console.log(response.data);
+                    // If payment is successful, you can complete the order
+                    // Note: Payment status will be updated manually later
+                    this.submitOrder();
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+        },
+        // Method to confirm payment
+        async confirmpayment() {
+            const paymentConfirmed = true;
+
+            if (paymentConfirmed) {
+                // Check if the order is already submitted
+                await this.submitOrder();
+            } else {
+                // Handle if payment is not confirmed
+                console.log("Payment not confirmed.");
+            }
         },
 
+        submitOrder() {
+            // Check if any of the required user data fields are empty
+            if (!this.userData.name || !this.userData.email || !this.userData.address || !this.userData.phone || !this.userData.location) {
+                alert('Please fill in all required fields');
+                return; // Exit the method if any field is empty
+            }
+
+            // Prepare order details
+            const orderDetails = {
+                user_name: this.userData.name,
+                email: this.userData.email,
+                address: this.userData.address,
+                phone: this.userData.phone,
+                location: this.userData.location,
+                total_amount: this.cartTotal(),
+                items: this.localcartData
+            };
+
+            // Set orderSubmitted flag to true to prevent double submission
+            this.orderSubmitted = true;
+
+            axios.post('http://localhost:3000/api/orders', orderDetails)
+                .then(response => {
+                    console.log(response.data);
+                    // Reset the userData and localcartData after successful submission
+                    this.userData = {
+                        name: '',
+                        email: '',
+                        address: '',
+                        phone: '',
+                        location: '',
+                    };
+
+                    this.localcartData = [];
+                    // Empty the cart in the database
+                    this.emptyCartInDatabase();
+                    // Redirect the user to the thank you page
+                    this.$router.push({ name: 'ThankYou', query: { orderId: response.data.orderId, orderSummary: JSON.stringify(orderDetails) } });
+                })
+                .catch(error => {
+                    console.error(error);
+                    // Reset the orderSubmitted flag if submission fails
+                    this.orderSubmitted = false;
+                });
+        },
+        emptyCartInDatabase() {
+            // Send a request to your server to empty the cart in the database
+            axios.delete('http://localhost:3000/api/clearCart')
+                .then(response => {
+                    console.log('Cart emptied successfully', response);
+                })
+                .catch(error => {
+                    console.error('Error emptying cart:', error);
+                });
+        }
+
+    },
+    mounted() {
+        this.shippingFee;
+        this.cartTotal();
     }
+
 }
 </script>
 <style scoped>

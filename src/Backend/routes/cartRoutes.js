@@ -2,8 +2,8 @@ module.exports = (app, client) => {
     // Endpoint to add items to cart
     app.post('/api/addToCart', (req, res) => {
         const product = req.body;
-
-        const { product_name, product_id, customer_id, image_path, quantity, sale_price, price } = product;
+        const { product_name, product_id, image_path, quantity, sale_price, price } = product;
+        const customer_id = product.customer_id !== undefined ? product.customer_id : null; // Check if customer_id is provided, otherwise default to null
 
         const sql = 'INSERT INTO cart (product_name, product_id, customer_id, image_path, quantity, sale_price, price) VALUES ($1, $2, $3, $4, $5, $6, $7)';
 
@@ -13,11 +13,10 @@ module.exports = (app, client) => {
                 res.status(500).json({ error: 'Internal Server Error' });
             } else {
                 res.status(200).json({ success: true, message: 'Product added to cart' });
-                console.log(results)
+                console.log(results);
             }
         });
     });
-
     // Endpoint to get all items in cart
     app.get('/api/allCartItems', async (req, res) => {
 
@@ -30,9 +29,6 @@ module.exports = (app, client) => {
             res.status(500).json({ error: 'Internal Server Error' });
         }
     });
-
-
-
 
     // Endpoint to update cart 
     app.post('/api/update-cart', async (req, res) => {
@@ -65,5 +61,20 @@ module.exports = (app, client) => {
             console.error(error);
             res.status(500).send('Internal Server Error');
         }
+    });
+
+    //Endpoint to Empty Cart
+    app.delete('/api/clearCart', (req, res) => {
+
+        const query = 'DELETE FROM cart';
+        client.query(query, (error, results) => {
+            console.log(results)
+            if (error) {
+                console.error(error);
+                res.status(500).send('Internal Server Error');
+            } else {
+                res.status(200).send('Cart cleared');
+            }
+        });
     });
 }

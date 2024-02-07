@@ -101,7 +101,9 @@
                             </div>
                         </div>
 
-
+                        <div class="w-full px-4">
+                            <a href="">Edit</a>
+                        </div>
                     </div>
                     <!-- End of about section -->
 

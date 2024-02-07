@@ -39,13 +39,14 @@ client.connect((err) => {
 
 });
 
-
 //API ROUTES
 require('./routes/productRoutes')(app, client);
 require('./routes/cartRoutes')(app, client);
 require('./routes/categoryRoutes')(app, client);
 require('./routes/customerRoutes')(app, client);
 require('./routes/wishlistRoutes')(app, client);
+require('./routes/ordersRoutes')(app, client);
+require('./routes/paymentRoutes')(app, client);
 
 
 // User registration
