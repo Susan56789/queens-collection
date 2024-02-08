@@ -1,5 +1,12 @@
 const { defineConfig } = require('@vue/cli-service');
+const webpack = require('webpack');
 
 module.exports = defineConfig({
-  // Your configuration options go here
+  configureWebpack: {
+    plugins: [
+      new webpack.DefinePlugin({
+        __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: JSON.stringify(true)
+      })
+    ]
+  }
 });

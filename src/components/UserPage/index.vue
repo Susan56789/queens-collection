@@ -98,19 +98,76 @@
                                     <div class="px-4 py-2 font-semibold">Birthday</div>
                                     <div class="px-4 py-2"><small>{{ formatDate(localUserData.dob) }}</small></div>
                                 </div>
+
                             </div>
                         </div>
 
-                        <div class="w-full px-4">
-                            <a href="">Edit</a>
+                        <!-- Edit button -->
+                        <div v-if="!editMode" class="w-full px-4 mb-4">
+                            <button @click="editProfile">Edit</button>
+                        </div>
+                        <!-- Profile information or edit form -->
+                        <div v-if="!editMode">
+                            <!-- Profile information -->
+                            <div class="text-gray-700">
+                                <!-- Profile information code remains unchanged -->
+                            </div>
+                        </div>
+                        <div v-else class=" mx-auto items-center justify-center shadow-lg mx-8 mb-4 max-w-lg">
+                            <h2 class="px-4 pt-3 pb-2 text-gray-800 text-lg">Edit your Details:</h2>
+                            <!-- Edit form -->
+                            <form @submit.prevent="updateProfile" class="w-full max-w-xl bg-white rounded-lg px-4 pt-2">
+
+                                <div class="grid grid-cols-2">
+                                    <div class="px-4 py-2 font-semibold">First Name</div>
+                                    <div class="px-4 py-2">
+                                        <input v-model="editedUserData.fname" type="text">
+                                    </div>
+                                    <div class="px-4 py-2 font-semibold">Last Name</div>
+                                    <div class="px-4 py-2">
+                                        <input v-model="editedUserData.lname" type="text">
+                                    </div>
+                                    <div class="px-4 py-2 font-semibold">Gender</div>
+                                    <div class="px-4 py-2">
+                                        <input v-model="editedUserData.gender" type="text">
+                                    </div>
+                                    <div class="px-4 py-2 font-semibold">Phone:</div>
+                                    <div class="px-4 py-2">
+                                        <input v-model="editedUserData.phone" type="tel">
+                                    </div>
+                                    <div class="px-4 py-2 font-semibold">DOB</div>
+                                    <div class="px-4 py-2">
+                                        <input v-model="editedUserData.dob" type="date">
+                                    </div>
+                                    <div class="px-4 py-2 font-semibold">Address</div>
+                                    <div class="px-4 py-2">
+                                        <input v-model="editedUserData.address" type="text">
+                                    </div>
+                                    <div class="px-4 py-2 font-semibold">City</div>
+                                    <div class="px-4 py-2">
+                                        <input v-model="editedUserData.city" type="text">
+                                    </div>
+                                    <div class="px-4 py-2 font-semibold">Country</div>
+                                    <div class="px-4 py-2">
+                                        <input v-model="editedUserData.country" type="text">
+                                    </div>
+                                </div>
+                                <!-- Other form fields -->
+                                <!-- Submit and cancel buttons -->
+                                <div class="w-full flex justify-between mt-4 px-4">
+                                    <button type="submit">Save</button>
+                                    <button @click="cancelEdit">Cancel</button>
+                                </div>
+                            </form>
                         </div>
                     </div>
+
                     <!-- End of about section -->
 
                     <div class="my-4"></div>
 
                     <!-- Orders -->
-                    <div class="bg-white p-3 shadow-sm rounded-sm">
+                    <div v-if="ordersList" class="bg-white p-3 shadow-sm rounded-sm">
                         <div class="flex items-center space-x-2 font-semibold text-gray-900 leading-8 mb-3">
                             <span class="text-red-500">
                                 <svg class="h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -141,6 +198,9 @@
                             </tbody>
                         </table>
                     </div>
+                    <div v-else class="bg-white p-3 shadow-sm rounded-sm">
+                        <p>Your Orders Will Appear Here</p>
+                    </div>
                     <!-- End of Orders section -->
                 </div>
                 <!-- End of profile tab -->
@@ -154,6 +214,7 @@
 
 <script>
 import userService from '@/auth/userService';
+import axios from 'axios';
 
 export default {
     name: 'UserPage',
@@ -163,6 +224,8 @@ export default {
         return {
             localUserData: null,
             ordersList: [],
+            editMode: false,
+            editedUserData: {},
         };
     },
 
@@ -211,8 +274,11 @@ export default {
 
                     this.saveUserDataToLocalStorage();
                     return;
-                }
+                } else {
 
+                    this.$router.push('/login');
+
+                }
                 // Check if user data is stored in local storage and not expired
                 const storedUserData = localStorage.getItem('userData');
                 const storedTimestamp = localStorage.getItem('userDataTimestamp');
@@ -224,13 +290,12 @@ export default {
                     // Otherwise, fetch user data using the userService
                     const fetchedUserData = await userService.getUserData();
                     this.localUserData = fetchedUserData;
-
-
                     // Save user data to local storage with a timestamp
                     this.saveUserDataToLocalStorage();
 
                     await this.fetchOrders(this.localUserData.email); // Fetch orders after user data is obtained
                 }
+
             } catch (error) {
                 console.error('Error fetching user data:', error);
             }
@@ -257,7 +322,6 @@ export default {
                 // Assign latest orders to the ordersList data property
                 this.ordersList = latestOrders;
 
-                console.log('Fetched orders:', latestOrders);
             } catch (error) {
                 console.error('Error fetching orders:', error);
                 // Handle error, e.g., show a notification to the user
@@ -268,6 +332,56 @@ export default {
             userService.logout();
             this.$router.push('/login'); // Redirect to login page after logout
         },
+
+        editProfile() {
+            this.editMode = true;
+            this.editedUserData = { ...this.localUserData };
+        },
+
+        cancelEdit() {
+            this.editMode = false;
+            this.editedUserData = {};
+        },
+        async updateProfile() {
+            try {
+                // Calculate age from date of birth
+                const dobDate = new Date(this.editedUserData.dob);
+                const today = new Date();
+                let age = today.getFullYear() - dobDate.getFullYear();
+                const dobMonth = dobDate.getMonth();
+                const todayMonth = today.getMonth();
+                if (todayMonth < dobMonth || (todayMonth === dobMonth && today.getDate() < dobDate.getDate())) {
+                    age--;
+                }
+
+                // Check if age is 18 or over
+                if (age < 18) {
+                    // If age is less than 18, show alert and do not proceed with update
+                    alert('Age must be 18 and over.');
+                    return;
+                }
+
+                // If age is 18 or over, proceed with the update
+                const response = await axios.post('http://localhost:3000/api/user/update', this.editedUserData);
+
+                if (response.status === 200) {
+                    // Update localUserData with editedUserData
+                    this.localUserData = { ...this.editedUserData };
+                    this.saveUserDataToLocalStorage();
+
+                    // Exit edit mode
+                    this.cancelEdit();
+                } else {
+                    throw new Error('Failed to update profile');
+                }
+            } catch (error) {
+                console.error('Error updating profile:', error);
+                // Handle error
+            }
+        },
+
+
+
     },
 }
 

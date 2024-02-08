@@ -71,6 +71,7 @@ CREATE TABLE customers (
 );
 Insert into customers (fname,lname,phone,gender,address,city,country,pswd,dob,email) VALUES
 ('susan','wairimu','+254796486115','female','Nairobi','Nairobi','Kenya','User1234.','03/11/2000','devnimoh@gmail.com');
+
 select * from customers;
 
 CREATE OR REPLACE FUNCTION insert_customer_from_order()

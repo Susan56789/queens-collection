@@ -1,26 +1,39 @@
 <template>
     <div class="container flex-1 flexflex-col items-center max-w-lg mx-auto px-4 py-28">
-        <div class="flex flex-col p-6 rounded-2xl shadow-xl">
+        <form @submit.prevent="addUser" class="flex flex-col p-6 rounded-2xl shadow-xl">
             <h1 class="text-center text-5xl mb-6 text-black">Sign Up</h1>
 
-            <input id="name" type="text"
+            <input v-model="user.fname" id="fname" type="text"
                 class="w-auto mb-8 mt-6 mx-8 rounded-lg focus: text-black placeholder-black-200 border-black-200 border-t-transparent bg-transparent focus:outline-none focus:ring-transparent focus:border-black-200 focus:placeholder-transparent focus:text-black"
-                placeholder="Name" />
+                placeholder="First Name" />
 
-            <input id="email" type="email"
-                class="w-auto  mb-8 mt-6 mx-8 rounded-lg shadow-none text-black placeholder-black-200 border-black-200 border-t-transparent bg-transparent focus:outline-none focus:ring-transparent focus:border-black-200 focus:placeholder-transparent focus:text-black"
-                placeholder="Email" />
+            <input v-model="user.lname" id="lname" type="text"
+                class="w-auto mb-8 mt-6 mx-8 rounded-lg focus: text-black placeholder-black-200 border-black-200 border-t-transparent bg-transparent focus:outline-none focus:ring-transparent focus:border-black-200 focus:placeholder-transparent focus:text-black"
+                placeholder="Last Name" />
 
-            <input id="password" type="password"
+            <input v-model="user.email" id="newemail" type="email"
+                class="w-auto  mb-8 mt-6 mx-8 rounded-lg shadow-none 
+                text-black placeholder-black-200 border-black-200 border-t-transparent 
+                bg-transparent focus:outline-none focus:ring-transparent focus:border-black-200 focus:placeholder-transparent focus:text-black" placeholder="Email" />
+            <input v-model="user.phone" id="phone" type="tel"
+                class="w-auto mb-8 mt-6 mx-8 rounded-lg focus: text-black placeholder-black-200 border-black-200 border-t-transparent bg-transparent focus:outline-none focus:ring-transparent focus:border-black-200 focus:placeholder-transparent focus:text-black"
+                placeholder="Phone Number" />
+
+            <input v-model="user.dob" id="dob" type="date"
+                class="w-auto mb-8 mt-6 mx-8 rounded-lg focus: text-black placeholder-black-200 border-black-200 border-t-transparent bg-transparent focus:outline-none focus:ring-transparent focus:border-black-200 focus:placeholder-transparent focus:text-black"
+                placeholder="DOB" />
+
+
+            <input v-model="user.pswd" id="password" type="password"
                 class="text-black  w-auto mb-8 mt-6 mx-8 rounded-lg bg-transparent border-black-200 border-t-transparent placeholder-black-200 focus:outline-none focus:ring-transparent focus:border-black-200 focus:placeholder-transparent focus:text-black"
                 placeholder="Password" />
 
-            <input id="password confirm" type="password"
+            <input v-model="user.pswd2" id="password_confirm" type="password"
                 class="w-auto  mb-8 mt-6 mx-8 rounded-lg text-black
                 placeholder-black-200 border-black-200 border-t-transparent bg-transparent focus:outline-none focus:ring-transparent focus:border-black-200 focus:placeholder-transparent focus:text-black"
                 placeholder="Confirm Password" />
 
-            <button
+            <button @click="addUser"
                 class="relative inline-flex items-center justify-center p-0.5
                  mb-8 mt-6 mx-8 overflow-hidden text-sm font-medium text-black
                   rounded-lg group bg-gradient-to-br from-red-600 to-pink-500 group-hover:from-red-600 group-hover:to-pink-500 hover:text-white dark:text-white focus:outline-none dark:focus:ring-pink-800">
@@ -98,13 +111,98 @@
                 </a>
             </div>
             <!--  -->
-        </div>
+        </form>
     </div>
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
-    name: 'NewUser'
+    name: 'NewUser',
+    data() {
+        return {
+            user: {
+                fname: '',
+                lname: '',
+                email: '',
+                phone: '',
+                dob: '',
+                pswd: '',
+                pswd2: '',
+
+            },
+            emailExists: false,
+        }
+    },
+    methods: {
+        checkEmailExists() {
+            axios.post("http://localhost:3000/api/check-email", { email: this.user.email })
+                .then(response => {
+                    this.emailExists = response.data.exists;
+                })
+                .catch(error => {
+                    console.error("Error checking email", error);
+                });
+        },
+        async addUser() {
+            // Check if passwords match
+            if (this.user.pswd !== this.user.pswd2) {
+                console.error("Passwords do not match");
+                return;
+            }
+
+            const phoneRegex = /^07\d{8}$/;
+            if (!phoneRegex.test(this.user.phone)) {
+                alert('Please enter a valid phone number');
+                return;
+            }
+
+            // Calculate age from date of birth
+            const dobDate = new Date(this.user.dob);
+            const today = new Date();
+            let age = today.getFullYear() - dobDate.getFullYear();
+            const dobMonth = dobDate.getMonth();
+            const todayMonth = today.getMonth();
+            if (todayMonth < dobMonth || (todayMonth === dobMonth && today.getDate() < dobDate.getDate())) {
+                age--;
+            }
+
+            // Check if age is 18 or over
+            if (age < 18) {
+                // If age is less than 18, show alert and do not proceed with update
+                alert('Age must be 18 and over.');
+                return;
+            }
+
+            try {
+                // Check if email already exists
+                await this.checkEmailExists();
+
+                // Proceed with adding user only if email doesn't exist
+                if (!this.emailExists) {
+                    const response = await axios.post("http://localhost:3000/api/user", this.user);
+                    console.log("Account Created Successfully", response.data);
+                    this.$router.push('/login');
+                    // Reset the form data after successful submission
+                    this.user = {
+                        fname: '',
+                        lname: '',
+                        email: '',
+                        phone: '',
+                        dob: '',
+                        pswd: '',
+                        pswd2: '',
+                    };
+                } else {
+                    console.error("Email already in use");
+                    alert('Email already in use.');
+                }
+            } catch (error) {
+                console.error("Error adding user", error);
+            }
+        }
+    }
 }
 </script>
 

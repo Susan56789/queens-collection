@@ -7,28 +7,28 @@
                 <h1 class="text-xl font-semibold">Change Password</h1>
             </div>
             <p class="text-sm text-gray-600 mb-6">Update password for enhanced account security.</p>
-            <form id="changePasswordForm" class="space-y-6">
+            <form @submit.prevent="updatePassword" id="changePasswordForm" class="space-y-6">
                 <div>
                     <label for="currentPassword" class="text-sm font-medium text-gray-700 block mb-2">Email *</label>
-                    <input type="email" id="currentEmail"
+                    <input v-model="credentials.email" type="email" id="currentEmail"
                         class="email-input form-input block w-full border border-gray-300 rounded-md shadow-sm" required>
                 </div>
                 <div>
                     <label for="newPassword" class="text-sm font-medium text-gray-700 block mb-2">New Password *</label>
-                    <input type="password" id="newPassword"
+                    <input v-model="credentials.pswd" type="password" id="newPassword"
                         class="password-input form-input block w-full border border-gray-300 rounded-md shadow-sm" required>
                 </div>
                 <div>
                     <label for="confirmPassword" class="text-sm font-medium text-gray-700 block mb-2">Confirm New Password
                         *</label>
-                    <input type="password" id="confirmPassword"
+                    <input v-model="credentials.pswd2" type="password" id="confirmPassword"
                         class="password-input form-input block border w-full border-gray-300 rounded-md shadow-sm" required>
                     <button type="button" onclick="clearConfirmPassword()"
                         class="text-xs text-red-600 hover:underline mt-1">Clear</button>
                 </div>
                 <div id="passwordCriteria" class="text-sm space-y-2">
                     <p class="text-red-500">
-                        <Pic></Pic>Password Must contain:
+                        Password Must contain:
                     </p>
                     <ul class="list-disc pl-5 space-y-1">
                         <li>At least 1 uppercase</li>
@@ -40,7 +40,7 @@
                     <a href="/sign-up" type="button" class="px-4 py-2 text-sm font-medium text-gray-700 
                         bg-gray-200 rounded-md hover:bg-gray-300 focus:outline-none 
                         focus:ring focus:border-red-300">Sign Up?</a>
-                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white
+                    <button @click="updatePassword" class="px-4 py-2 text-sm font-medium text-white
                          bg-red-600 rounded-md hover:bg-red-700 focus:outline-none
                           focus:ring focus:border-red-300">Apply
                         Changes</button>
@@ -48,12 +48,54 @@
             </form>
         </div>
 
-
     </div>
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
-    name: 'ForgotPassword'
+    name: 'ForgotPassword',
+    data() {
+        return {
+            credentials: {
+                email: '',
+                pswd: '',
+                pswd2: '',
+            },
+        };
+    },
+    methods: {
+        async updatePassword() {
+            try {
+                // Validate if passwords match
+                if (this.credentials.pswd !== this.credentials.pswd2) {
+                    alert("Passwords do not match.");
+                    return;
+                }
+
+                // Make a POST request to your backend API
+                const response = await axios.post('http://localhost:3000/api/updatePassword', {
+                    email: this.credentials.email,
+                    newPassword: this.credentials.pswd
+                });
+
+                // Handle response from server
+                if (response.status === 200) {
+                    this.$router.push('/login');
+                    // Password updated successfully
+                    alert("Password updated successfully!");
+
+                } else {
+                    // Handle other status codes or errors
+                    alert("Failed to update password. Please try again later.");
+                }
+            } catch (error) {
+                console.error("Error updating password:", error);
+                // Handle error
+                alert("An error occurred while updating password. Please try again later.");
+            }
+        }
+    }
 }
 </script>
