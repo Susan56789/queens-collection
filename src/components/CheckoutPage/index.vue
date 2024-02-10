@@ -157,10 +157,20 @@
                         </div>
 
                     </div>
-                    <div>
-                        <button @click="confirmpayment" class="block w-full max-w-xs mx-auto bg-red-500 hover:bg-red-700
+                    <div v-if="paymentConfirmed">
+                        <p class="text-green">Please submit your order now.</p>
+                        <button @click="submitOrder" class="block w-full max-w-xs mx-auto bg-red-500 hover:bg-red-700
                              focus:bg-red-700 text-white rounded-lg px-3 py-2 font-semibold"><i
                                 class="mdi mdi-lock-outline mr-1"></i> Complete Order</button>
+                    </div>
+                    <div v-else-if="paymentFailed">
+                        <!-- Show message if payment failed -->
+                        <p class="text-red">Payment was not successful. Please try again.</p>
+                    </div>
+
+                    <div v-else>
+                        <!-- Default message or loader while processing payment -->
+                        <p>Waiting for payment...</p>
                     </div>
                 </div>
             </div>
@@ -198,6 +208,8 @@ export default {
             orderSubmitted: false,
             phone: '',
             amount: 0,
+            paymentConfirmed: false,
+            paymentFailed: false,
         };
     },
     created() {
@@ -258,25 +270,15 @@ export default {
             axios.post('http://localhost:3000/api/mpesa/payment', paymentData)
                 .then(response => {
                     console.log(response.data);
-                    // If payment is successful, you can complete the order
-                    // Note: Payment status will be updated manually later
-                    this.submitOrder();
+                    // If payment is successful, you can set a flag to indicate payment success
+                    // and then handle order submission elsewhere (e.g., in confirmpayment method)
+                    this.paymentConfirmed = true;
                 })
                 .catch(error => {
                     console.error(error);
+                    // If payment fails, set paymentFailed to true
+                    this.paymentFailed = true;
                 });
-        },
-        // Method to confirm payment
-        async confirmpayment() {
-            const paymentConfirmed = true;
-
-            if (paymentConfirmed) {
-                // Check if the order is already submitted
-                await this.submitOrder();
-            } else {
-                // Handle if payment is not confirmed
-                console.log("Payment not confirmed.");
-            }
         },
 
         submitOrder() {
@@ -338,7 +340,6 @@ export default {
     },
     mounted() {
         this.shippingFee;
-        this.cartTotal();
     }
 
 }

@@ -87,7 +87,6 @@ const routes = [
             {
                 path: "/product/:name",
                 component: () => import("./components/SingleProduct/index.vue"),
-
                 name: 'SingleProduct',
                 meta: { breadcrumb: ':name' }
             },

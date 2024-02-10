@@ -10,8 +10,9 @@
             </div>
             <div class="w-full  bg-white flex flex-col space-y-2 p-3">
                 <div class="flex justify-between item-center">
-                    <p class="text-gray-500 font-medium hidden md:block">{{ categoryName }}</p>
-
+                    <router-link :to="'/category/' + categoryName">
+                        <p class="text-gray-500 font-medium hidden md:block">{{ categoryName }}</p>
+                    </router-link>
                     <button @click="addToWishlistButton(product)">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-pink-500" viewBox="0 0 20 20"
                             fill="currentColor">
@@ -48,7 +49,9 @@
             </div>
         </div>
         <div>
-            <RelatedProducts :relatedProducts="relatedProducts" @add-to-cart="addToCart" />
+            <router-view>
+                <RelatedProducts :relatedProducts="relatedProducts" @add-to-cart="addToCart" />
+            </router-view>
         </div>
     </div>
 </template>
