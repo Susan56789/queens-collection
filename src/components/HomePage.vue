@@ -1,6 +1,4 @@
 <template>
-    <router-view></router-view>
-
     <main class="my-8">
         <div class="container mx-auto px-6">
             <div class="h-64 rounded-md overflow-hidden bg-cover bg-center"
@@ -12,8 +10,11 @@
                             materials. Improved airflow ensures your feet stay dry, reducing the risk of discomfort and
                             blisters.</p>
                         <button
-                            class="flex items-center mt-4 px-3 py-2 bg-red-600 text-white text-sm uppercase font-medium rounded hover:bg-red-500 focus:outline-none focus:bg-red-500">
-                            <span>Shop Now</span>
+                            class="flex items-center mt-4 px-3 py-2 bg-red-600 text-white
+                             text-sm uppercase font-medium rounded hover:bg-red-500 focus:outline-none focus:bg-red-500">
+                            <router-link to="/shop">
+                                <span>Shop Now</span>
+                            </router-link>
                             <svg class="h-5 w-5 mx-2" fill="none" stroke-linecap="round" stroke-linejoin="round"
                                 stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
                                 <path d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
@@ -50,19 +51,24 @@
                             <p class="mt-2 text-white">Stay ahead of the fashion curve with our trendsetting styles. We
                                 meticulously curate our collection to bring you the latest in clothing, accessories, and
                                 footwear, ensuring you're always a step ahead in the style game.</p>
+
                             <button
                                 class="flex items-center mt-4 text-white text-sm uppercase font-medium rounded hover:underline focus:outline-none">
-                                <span>Shop Now</span>
+
+                                <span>
+                                    Shop Now
+                                </span>
                                 <svg class="h-5 w-5 mx-2" fill="none" stroke-linecap="round" stroke-linejoin="round"
                                     stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
                                     <path d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
                                 </svg>
                             </button>
+
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="mt-16">
+            <div v-if="allProducts" class="mt-16">
                 <h3 class="text-gray-600 text-2xl font-medium">New Arrivals</h3>
                 <div class="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mt-6">
                     <div v-for="product  in allProducts" :key="product.product_id"
@@ -97,7 +103,7 @@
 
                 </div>
             </div>
-            <div class="mt-16">
+            <div v-if="productsOnSale" class="mt-16">
                 <h3 class="text-gray-600 text-2xl font-medium">Today's Offer</h3>
                 <div class="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mt-6">
                     <div v-for="product  in productsOnSale" :key="product.product_id"
