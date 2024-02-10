@@ -32,9 +32,12 @@
                             <p class="mt-2 text-white">Crafted from high-quality, durable materials, our backpacks are built
                                 to withstand the rigors of daily use and the challenges of outdoor exploration. Reinforced
                                 stitching and robust zippers ensure longevity.</p>
+
                             <button
                                 class="flex items-center mt-4 text-white text-sm uppercase font-medium rounded hover:underline focus:outline-none">
-                                <span>Shop Now</span>
+                                <router-link to="/category/Backpacks">
+                                    <span>Shop Now</span>
+                                </router-link>
                                 <svg class="h-5 w-5 mx-2" fill="none" stroke-linecap="round" stroke-linejoin="round"
                                     stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
                                     <path d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
@@ -68,7 +71,7 @@
                     </div>
                 </div>
             </div>
-            <div v-if="allProducts" class="mt-16">
+            <div v-if="allProducts.length > 0" class="mt-16">
                 <h3 class="text-gray-600 text-2xl font-medium">New Arrivals</h3>
                 <div class="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mt-6">
                     <div v-for="product  in allProducts" :key="product.product_id"
@@ -103,7 +106,7 @@
 
                 </div>
             </div>
-            <div v-if="productsOnSale" class="mt-16">
+            <div v-if="productsOnSale.length > 0" class="mt-16">
                 <h3 class="text-gray-600 text-2xl font-medium">Today's Offer</h3>
                 <div class="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mt-6">
                     <div v-for="product  in productsOnSale" :key="product.product_id"
