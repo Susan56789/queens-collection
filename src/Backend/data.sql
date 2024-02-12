@@ -203,10 +203,11 @@ ADD COLUMN customer_name VARCHAR(100),
 ADD COLUMN email VARCHAR(100);
 
 ALTER TABLE payments
-ADD COLUMN order_id SERIAL;
-
+ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ADD COLUMN order_id VARCHAR(255); 
 
 SELECT * FROM payments;
+
 CREATE TABLE wishlist (
     wishlist_id SERIAL PRIMARY KEY,
     customer_id INT,

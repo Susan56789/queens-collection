@@ -52,4 +52,17 @@ module.exports = (app, client) => {
         }
     });
 
+    // Route to handle updating payment status
+    app.post('/api/updatePayment', async (req, res) => {
+        const { payment_id, newStatus } = req.body;
+        try {
+            const result = await client.query('UPDATE payments SET status = $1 WHERE payment_id = $2', [newStatus, payment_id]);
+            res.json({ success: true, message: 'Payment status updated successfully' });
+        } catch (error) {
+            console.error('Error updating payment status:', error);
+            res.status(500).json({ success: false, error: 'Internal server error' });
+        }
+    });
+
+
 }

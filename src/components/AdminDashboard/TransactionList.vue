@@ -28,6 +28,9 @@
                                     <th scope="col"
                                         class="p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Status</th>
+                                    <th scope="col"
+                                        class="p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white">
@@ -43,10 +46,21 @@
                                         {{ formatCurrency(transaction.amount) }}
                                     </td>
                                     <td class="p-4 whitespace-nowrap text-sm font-semibold">
-                                        <p v-if="transaction.status === 'pending'" class="pending">Pending</p>
-                                        <p v-else-if="transaction.status === 'failed'" class="failed">Failed</p>
-                                        <p v-else-if="transaction.status === 'completed'" class="completed">Completed</p>
-                                        <p v-else class="unknown">Unknown</p>
+                                        <p :class="getStatusClass(transaction.status)">{{ transaction.status }}</p>
+                                    </td>
+                                    <td class="p-4 whitespace-nowrap text-sm font-semibold edit">
+                                        <button @click="openModal(transaction)" class="relative flex flex-row items-center h-11 focus:outline-none 
+        border-l-4 border-transparent  pr-6">
+                                            <span class="inline-flex justify-center items-center ml-4">
+                                                <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                    viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+                                                    </path>
+                                                </svg>
+                                            </span>
+                                            <span class="ml-2 text-sm tracking-wide truncate">Edit</span>
+                                        </button>
                                     </td>
                                 </tr>
                             </tbody>
@@ -55,14 +69,66 @@
                 </div>
             </div>
         </div>
+        <!-- Modal -->
+        <div v-if="showModal" class="fixed inset-0 z-10 overflow-y-auto" aria-labelledby="modal-title" role="dialog"
+            aria-modal="true">
+            <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                <!-- Background overlay -->
+                <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+
+                <!-- Modal panel -->
+                <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+                <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6"
+                    role="dialog" aria-modal="true" aria-labelledby="modal-headline">
+                    <!-- Modal content -->
+                    <div>
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                            <h3 class="text-lg font-medium leading-6 text-gray-900" id="modal-headline">
+                                Update Transaction Status
+                            </h3>
+                            <!-- Add your form here -->
+                            <div class="mt-5">
+                                <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
+                                <select id="status" v-model="newStatus" name="status"
+                                    class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 
+                                    focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                                    <option value="pending">Pending</option>
+                                    <option value="failed">Failed</option>
+                                    <option value="completed">Completed</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Modal footer -->
+                    <div class="mt-5 sm:mt-6">
+                        <button @click="saveChanges(transaction)" type="button"
+                            class="inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-cyan-600 text-base font-medium text-white hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 sm:text-sm">
+                            Save Changes
+                        </button>
+                        <button @click="closeModal" type="button"
+                            class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 sm:text-sm">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
-  
+
 <script>
 export default {
     name: 'TransactionList',
     props: {
         transactions: Array
+    },
+    data() {
+        return {
+            showModal: false,
+            selectedIndex: null,
+            newStatus: 'pending',
+            selectedTransaction: null
+        };
     },
     methods: {
         formatDate(dateString) {
@@ -72,15 +138,56 @@ export default {
         formatCurrency(value) {
             const numericValue = parseFloat(value);
             if (isNaN(numericValue) || numericValue === 0) {
-                return 'KES 0.00'; // Return 'KES 0.00' when the value is not a valid number or is 0
+                return 'KES 0.00';
             } else {
                 return numericValue.toLocaleString('en-KE', { style: 'currency', currency: 'KES' });
             }
         },
+        getStatusClass(status) {
+            switch (status) {
+                case 'pending':
+                    return 'pending';
+                case 'failed':
+                    return 'failed';
+                case 'completed':
+                    return 'completed';
+                default:
+                    return 'unknown';
+            }
+        },
+        saveChanges() {
+            if (!this.selectedTransaction || !this.selectedTransaction.payment_id) {
+                console.error('Transaction or payment_id is undefined.');
+                return;
+            }
+
+            this.$axios.post('http://localhost:3000/api/updatePayment', {
+                payment_id: this.selectedTransaction.payment_id,
+                newStatus: this.newStatus
+            })
+                .then(response => {
+                    // Handle success
+                    console.log(response.data);
+                    // Optionally, emit an event to notify parent component
+                    this.$emit('changes-saved');
+                    this.closeModal()
+                })
+                .catch(error => {
+                    // Handle error
+                    console.error('Error updating payment status:', error);
+                });
+        },
+        openModal(transaction) {
+            this.selectedTransaction = transaction;
+            this.showModal = true;
+        },
+        closeModal() {
+            this.showModal = false;
+        }
     }
 };
 </script>
-  
+
 <style scoped>
 .pending {
     color: chartreuse;
@@ -96,5 +203,13 @@ export default {
 
 .unknown {
     color: blue;
+}
+
+.edit {
+    color: black;
+}
+
+#status {
+    color: black;
 }
 </style>

@@ -2,8 +2,9 @@
     <div class="bg-gray-800 shadow-lg p-3">
         <div class="flex flex-col gap-4">
             <TransactionSummary :totalSummary="totalSummary" :previousWeekTotal="previousWeekTotal" />
+            <TransactionList :transactions="transactions" @update-transaction-status="handleUpdateTransactionStatus" />
             <LatestCustomers :transactions="transactions" />
-            <TransactionList :transactions="paginatedTransactions" />
+
         </div>
     </div>
 </template>
@@ -77,6 +78,13 @@ export default {
         }
     },
     methods: {
+        handleUpdateTransactionStatus({ index, newStatus }) {
+            // Ensure that 'transactions' array is not empty and 'index' is within bounds
+            if (index >= 0 && index < this.transactions.length) {
+                // Update the 'status' property of the transaction at the specified index
+                this.transactions[index].status = newStatus;
+            }
+        },
         paginateTransactions(page) {
             this.currentPage = page;
         },
