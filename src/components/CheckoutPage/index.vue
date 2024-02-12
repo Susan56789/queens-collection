@@ -273,7 +273,7 @@ export default {
                 return;
             }
 
-            const amount = this.cartTotal;
+            const amount = this.amountWithShipping;
             const phoneRegex = /^07\d{8}$/;
             const currentDate = new Date();
             const timestamp = currentDate.getTime(); // Get timestamp in milliseconds

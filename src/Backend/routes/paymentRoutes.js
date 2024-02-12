@@ -20,4 +20,36 @@ module.exports = (app, client) => {
         }
     });
 
+    // Define endpoint to fetch transactions
+    app.get('/api/transactions', async (req, res) => {
+        try {
+
+            const result = await client.query('SELECT * FROM payments');
+            res.json(result.rows); // Send JSON response with fetched data
+        } catch (error) {
+            console.error('Error fetching transactions:', error);
+            res.status(500).json({ error: 'Internal Server Error' });
+        }
+    });
+
+    // Endpoint to fetch transactions for a specific date range
+    app.get('/api/transactions/dates', async (req, res) => {
+        try {
+            const { start_date, end_date } = req.query;
+
+            // Fetch transactions from PostgreSQL
+            const query = `
+        SELECT * FROM payments
+        WHERE payment_date >= $1 AND payment_date <= $2
+      `;
+            const result = await client.query(query, [start_date, end_date]);
+
+            // Send the transactions data as JSON response
+            res.json(result.rows);
+        } catch (error) {
+            console.error('Error fetching transactions:', error);
+            res.status(500).json({ error: 'Internal server error' });
+        }
+    });
+
 }

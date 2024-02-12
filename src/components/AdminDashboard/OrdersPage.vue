@@ -2,23 +2,7 @@
     <div class=" bg-gray-800 shadow-lg   p-3 
         ">
         <div class="w-full grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-4">
-            <div class="bg-white shadow rounded-lg p-4 sm:p-6 xl:p-8  2xl:col-span-2">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="flex-shrink-0">
-                        <span class="text-2xl sm:text-3xl leading-none font-bold text-gray-900">$45,385</span>
-                        <h3 class="text-base font-normal text-gray-500">Sales this week</h3>
-                    </div>
-                    <div class="flex items-center justify-end flex-1 text-green-500 text-base font-bold">
-                        12.5%
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                            <path fill-rule="evenodd"
-                                d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L6.707 7.707a1 1 0 01-1.414 0z"
-                                clip-rule="evenodd"></path>
-                        </svg>
-                    </div>
-                </div>
-                <div id="main-chart"></div>
-            </div>
+            <TransactionSummary :totalSummary="totalSummary" :previousWeekTotal="previousWeekTotal" />
             <div class="bg-white shadow rounded-lg p-4 sm:p-6 xl:p-8 ">
                 <div class="mb-4 flex items-center justify-between">
                     <div>
@@ -445,7 +429,125 @@
 </template>
 
 <script>
+import TransactionSummary from '@/components/AdminDashboard/TransactionSummary'
+
 export default {
-    name: 'OrdersPage'
+    name: 'OrdersPage',
+    components: {
+        TransactionSummary,
+    },
+    data() {
+        return {
+
+            transactions: [],
+            currentPage: 1,
+            itemsPerPage: 5,
+            previousWeekTotal: 0,
+            currentWeekTotal: 0,
+            percentageChange: 0,
+        };
+    },
+    async mounted() {
+        await this.fetchTransactions();
+        // Calculate previous and current week's total sales
+        this.previousWeekTotal = await this.calculatePreviousWeekTotal();
+        this.currentWeekTotal = await this.calculateCurrentWeekTotal();
+        // Calculate percentage change
+        this.calculatePercentageChange();
+    },
+    computed: {
+        totalSummary() {
+            // Ensure transactions is an array before filtering
+            if (!Array.isArray(this.transactions)) {
+                return { totalTransactions: 0, totalAmount: 0 };
+            }
+
+            // Filter transactions for the past week
+            const pastWeekTransactions = this.transactions.filter(transaction => {
+                const transactionDate = new Date(transaction.payment_date);
+                const weekAgo = new Date();
+                weekAgo.setDate(weekAgo.getDate() - 7);
+                return transactionDate > weekAgo;
+            });
+
+            // Calculate total amount and number of transactions
+            const totalAmount = pastWeekTransactions.reduce((total, transaction) => {
+                return total + parseFloat(transaction.amount || 0);
+            }, 0);
+
+            return {
+                totalTransactions: pastWeekTransactions.length,
+                totalAmount: totalAmount.toFixed(2)
+            };
+        },
+        paginatedTransactions() {
+            // Paginate transactions based on currentPage and itemsPerPage
+            const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+            const endIndex = startIndex + this.itemsPerPage;
+            return this.transactions.slice(startIndex, endIndex);
+        },
+        totalPages() {
+            return Math.ceil(this.transactions.length / this.itemsPerPage);
+        }
+    },
+    methods: {
+        paginateTransactions(page) {
+            this.currentPage = page;
+        },
+        async fetchTransactions() {
+            try {
+                const response = await this.$axios.get('http://localhost:3000/api/transactions');
+                console.log('API Response:', response.data); // Log the response data
+                this.transactions = response.data;
+                console.log('Transactions:', this.transactions); // Log the transactions array
+            } catch (error) {
+                console.error('Error fetching transactions:', error);
+            }
+        },
+        async calculatePreviousWeekTotal() {
+            try {
+                // Calculate the start and end dates of the previous week
+                const today = new Date();
+                const endOfWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay());
+                const startOfWeek = new Date(endOfWeek.getFullYear(), endOfWeek.getMonth(), endOfWeek.getDate() - 7);
+
+                // Format the start and end dates as needed (e.g., to ISO string for API request)
+                const startDateString = startOfWeek.toISOString();
+                const endDateString = endOfWeek.toISOString();
+
+                // Fetch transactions data for the previous week from your API
+                const response = await this.$axios.get(`http://localhost:3000/api/transactions/dates?start_date=${startDateString}&end_date=${endDateString}`);
+                const transactions = response.data;
+
+                // Filter transactions that occurred within the previous week
+                const previousWeekTransactions = transactions.filter(transaction => {
+                    const transactionDate = new Date(transaction.payment_date);
+                    return transactionDate >= startOfWeek && transactionDate <= endOfWeek;
+                });
+
+                // Calculate the total sales amount for the previous week
+                const previousWeekTotal = previousWeekTransactions.reduce((total, transaction) => {
+                    return total + parseFloat(transaction.amount || 0);
+                }, 0);
+
+                return previousWeekTotal;
+            } catch (error) {
+                console.error('Error calculating previous week total:', error);
+                return 0; // Return 0 in case of error
+            }
+        },
+        async calculateCurrentWeekTotal() {
+            // Implement the logic to calculate the current week's total sales similar to calculatePreviousWeekTotal
+        },
+        calculatePercentageChange() {
+            // Calculate percentage change
+            if (this.previousWeekTotal !== 0) {
+                this.percentageChange = ((this.currentWeekTotal - this.previousWeekTotal) / this.previousWeekTotal) * 100;
+            } else {
+                this.percentageChange = 0;
+            }
+        }
+    },
+
 }
 </script>
