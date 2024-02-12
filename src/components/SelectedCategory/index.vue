@@ -7,10 +7,11 @@
                 <p class="text-black-500">{{ `${paginatedProducts.length} Items` }}</p>
                 <div class="flex items-center">
                     <p class="text-black-500">Sort</p>
-                    <select class="font-medium text-black-700 bg-transparent dark:text-black-500 focus:outline-none">
-                        <option value="#">Recommended</option>
-                        <option value="#">Size</option>
-                        <option value="#">Price</option>
+                    <select class="font-medium text-black-700 bg-transparent dark:text-black-500 focus:outline-none"
+                        @change="sortProducts($event.target.value)">
+                        <option value="priceLowToHigh">Price: Low to High</option>
+                        <option value="latest">Latest</option>
+                        <option value="priceHighToLow">Price: High to Low</option>
                     </select>
                 </div>
             </div>
@@ -75,6 +76,7 @@ export default {
             currentPage: 1,
             productsPerPage: 12,
             totalProducts: 0,
+            sortCriteria: 'priceLowToHigh'
 
         };
     },
@@ -157,6 +159,30 @@ export default {
 
             }
         },
+        sortProducts(criteria) {
+            if (this.products.length === 0) return;
+
+            switch (criteria) {
+                case 'latest':
+                    // Sort products by their primary key (assuming it increments with new entries)
+                    this.products.sort((a, b) => b.product_id - a.product_id);
+                    break;
+                case 'priceLowToHigh':
+                    this.products.sort((a, b) => a.price - b.price);
+                    break;
+                case 'priceHighToLow':
+                    this.products.sort((a, b) => b.price - a.price);
+                    break;
+                default:
+                    // Default to sorting by price low to high
+                    this.products.sort((a, b) => a.price - b.price);
+                    break;
+            }
+
+            // Reset current page to the first page after sorting
+            this.currentPage = 1;
+        },
+
     },
     computed: {
         filteredProducts() {

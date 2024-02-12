@@ -7,10 +7,11 @@
                 <p class="text-black-500">{{ `${paginatedProducts.length} Items` }}</p>
                 <div class="flex items-center">
                     <p class="text-black-500">Sort</p>
-                    <select class="font-medium text-black-700 bg-transparent dark:text-black-500 focus:outline-none">
-                        <option value="#">Recommended</option>
-                        <option value="#">Size</option>
-                        <option value="#">Price</option>
+                    <select class="font-medium text-black-700 bg-transparent dark:text-black-500 focus:outline-none"
+                        @change="sortProducts($event.target.value)">
+                        <option value="priceLowToHigh">Price: Low to High</option>
+                        <option value="latest">Latest</option>
+                        <option value="priceHighToLow">Price: High to Low</option>
                     </select>
                 </div>
             </div>
@@ -75,7 +76,8 @@ export default {
             currentPage: 1,
             productsPerPage: 12,
             totalProducts: 0,
-            selectedProduct: null
+            selectedProduct: null,
+            sortCriteria: 'priceLowToHigh'
         };
     },
     components: {
@@ -97,6 +99,7 @@ export default {
                 this.totalProducts = sortedProducts.length;
                 // Calculate amount saved for each product
                 this.calculateAmountSavedForEachProduct();
+
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
@@ -163,19 +166,39 @@ export default {
 
             }
         },
-
-
         formatCurrency(value) {
             const numericValue = parseFloat(value);
             return isNaN(numericValue) ? '-' : numericValue.toLocaleString('en-KE', { style: 'currency', currency: 'KES' });
         },
+        sortProducts(criteria) {
+            if (this.products.length === 0) return;
 
+            switch (criteria) {
+                case 'latest':
+                    // Sort products by their primary key (assuming it increments with new entries)
+                    this.products.sort((a, b) => b.product_id - a.product_id);
+                    break;
+                case 'priceLowToHigh':
+                    this.products.sort((a, b) => a.price - b.price);
+                    break;
+                case 'priceHighToLow':
+                    this.products.sort((a, b) => b.price - a.price);
+                    break;
+                default:
+                    // Default to sorting by price low to high
+                    this.products.sort((a, b) => a.price - b.price);
+                    break;
+            }
+
+            // Reset current page to the first page after sorting
+            this.currentPage = 1;
+        },
     },
     computed: {
         paginatedProducts() {
             const startIndex = (this.currentPage - 1) * this.productsPerPage;
             const endIndex = startIndex + this.productsPerPage;
-
+            // Sort products by their primary key (assuming it increments with new entries)
             return (this.products || []).slice(startIndex, endIndex);
         },
         totalPages() {
@@ -190,7 +213,7 @@ export default {
 
             const sortedProducts = [...this.products].sort((a, b) => b.product_id - a.product_id);
 
-
+            this.sortProducts('latest');
             return sortedProducts.slice(0, 8);
         },
     },

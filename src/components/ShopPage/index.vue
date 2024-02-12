@@ -17,12 +17,13 @@
                         <p class="text-black-500">{{ `${paginatedProducts.length} Items` }}</p>
                         <div class="flex items-center">
                             <p class="text-black-500">Sort</p>
-                            <select
-                                class="font-medium text-black-700 bg-transparent dark:text-black-500 focus:outline-none">
-                                <option value="#">Recommended</option>
-                                <option value="#">Size</option>
-                                <option value="#">Price</option>
+                            <select class="font-medium text-black-700 bg-transparent dark:text-black-500 focus:outline-none"
+                                @change="sortProducts($event.target.value)">
+                                <option value="priceLowToHigh">Price: Low to High</option>
+                                <option value="latest">Latest</option>
+                                <option value="priceHighToLow">Price: High to Low</option>
                             </select>
+
                         </div>
                     </div>
                     <div class="grid grid-cols-1 gap-8 mt-8 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -87,7 +88,8 @@ export default {
             currentPage: 1,
             productsPerPage: 12,
             totalProducts: 0,
-            selectedProduct: null
+            selectedProduct: null,
+            sortCriteria: 'priceLowToHigh'
         };
     },
     components: {
@@ -172,17 +174,38 @@ export default {
             }
         },
         async fetchCategoryProducts() {
-
             try {
-                const response = await axios.get(
-                    `http://localhost:3000/api/productsByCategory?categoryId=${this.selectedCategory}`
-                );
+                const response = await axios.get(`http://localhost:3000/api/productsByCategory?categoryId=${this.selectedCategory}`);
                 this.categoryProducts = response.data;
-
                 this.totalProducts = this.categoryProducts.length;
+
+                // Sort products by their primary key (assuming it increments with new entries)
+                this.sortProducts('latest');
             } catch (error) {
                 console.error('Error fetching products', error);
             }
+        },
+
+        sortProducts(criteria) {
+            if (this.categoryProducts.length === 0) return;
+
+            switch (criteria) {
+                case 'latest':
+                    // Sort products by their primary key (assuming it increments with new entries)
+                    this.categoryProducts.sort((a, b) => b.product_id - a.product_id);
+                    break;
+                case 'priceLowToHigh':
+                    this.categoryProducts.sort((a, b) => a.price - b.price);
+                    break;
+                case 'priceHighToLow':
+                    this.categoryProducts.sort((a, b) => b.price - a.price);
+                    break;
+                default:
+                    this.categoryProducts.sort((a, b) => a.price - b.price);
+                    break;
+            }
+
+            this.currentPage = 1;
         },
     },
     computed: {
