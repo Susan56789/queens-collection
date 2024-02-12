@@ -2,7 +2,8 @@
     <div class="bg-white shadow rounded-lg p-4 sm:p-6 xl:p-8  2xl:col-span-2">
         <div class="flex items-center justify-between mb-4">
             <div class="flex-shrink-0">
-                <span class="text-2xl sm:text-3xl leading-none font-bold text-gray-900">{{ totalSummary.totalAmount
+                <span class="text-2xl sm:text-3xl leading-none font-bold text-gray-900">{{ formatCurrency(
+                    totalSummary.totalAmount)
                 }}</span>
                 <h3 class="text-base font-normal text-gray-500">Sales this week</h3>
             </div>
@@ -40,6 +41,16 @@ export default {
             const change = (this.totalSummary.totalAmount - this.previousWeekTotal) / this.previousWeekTotal * 100;
             return change.toFixed(2);
         }
+    },
+    methods: {
+        formatCurrency(value) {
+            const numericValue = parseFloat(value);
+            if (isNaN(numericValue) || numericValue === 0) {
+                return 'KES 0.00'; // Return 'KES 0.00' when the value is not a valid number or is 0
+            } else {
+                return numericValue.toLocaleString('en-KE', { style: 'currency', currency: 'KES' });
+            }
+        },
     }
 };
 </script>
