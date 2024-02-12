@@ -1,15 +1,9 @@
 <template>
-    <div class=" bg-gray-800 shadow-lg   p-3 
-        ">
-        <div class="w-full grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-4">
+    <div class="bg-gray-800 shadow-lg p-3">
+        <div class="flex flex-col gap-4">
             <TransactionSummary :totalSummary="totalSummary" :previousWeekTotal="previousWeekTotal" />
-            <TransactionList :transactions="paginatedTransactions" />
-
-        </div>
-        <div class="grid grid-cols-1 2xl:grid-cols-2 xl:gap-4 my-4">
-
             <LatestCustomers :transactions="transactions" />
-
+            <TransactionList :transactions="paginatedTransactions" />
         </div>
     </div>
 </template>
