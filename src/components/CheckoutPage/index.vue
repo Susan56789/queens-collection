@@ -146,13 +146,12 @@
                                         <input v-model="phone" type="tel" id="phone" placeholder="07xx xxx xxx" required
                                             class="border p-2 mb-4"><br />
                                         <label for="amount">Amount:</label>
-                                        <input v-model="amount" type="number" id="amount" required class="border p-2 mb-4">
+                                        <input v-model="amountWithShipping" type="text" id="amount" readonly
+                                            class="border p-2 mb-4">
                                         <button @click="makePayment" type="submit"
                                             class="bg-red-500 text-white p-2 rounded">Pay Now</button>
                                     </form>
                                 </div>
-
-
                             </div>
                         </div>
 
@@ -206,16 +205,19 @@ export default {
                 location: '',
             },
             orderSubmitted: false,
-            phone: '',
             amount: 0,
+            phone: '',
             paymentConfirmed: false,
             paymentFailed: false,
+            amountWithShipping: 0,
+            paymentInProgress: false,
+            orderId: 0,
         };
     },
     created() {
         const cartDataJson = this.$route.query.cartData;
         this.localcartData = cartDataJson ? JSON.parse(cartDataJson) : [];
-
+        console.log('CART DATA', JSON.stringify(this.localcartData))
     },
 
     computed: {
@@ -229,45 +231,76 @@ export default {
     methods: {
         cartTotal() {
             try {
-
                 const cartData = this.localcartData;
                 let totalAmount = 0;
                 cartData.forEach(item => {
-                    const itemPrice = parseFloat(item.sale_price || item.price);
-                    const itemQuantity = parseInt(item.quantity);
-                    if (!isNaN(itemPrice) && !isNaN(itemQuantity)) {
-                        totalAmount += itemPrice * itemQuantity;
-                    } else {
-                        console.error('Invalid item price or quantity:', item);
+                    if (item && (item.sale_price || item.price)) {
+                        const itemPrice = parseFloat((item.sale_price || item.price).replace(/[^\d.]/g, '').replace(',', '.'));
+                        const itemQuantity = parseInt(item.quantity);
+                        if (!isNaN(itemPrice) && !isNaN(itemQuantity)) {
+                            totalAmount += itemPrice * itemQuantity;
+                        } else {
+                            console.error('Invalid item price or quantity:', item);
+                        }
                     }
                 });
-                this.amount = totalAmount + this.shippingFee;
-
+                // Format total amount as currency
+                const formattedTotal = totalAmount.toLocaleString('en-KE', { style: 'currency', currency: 'KES' });
+                // Set formatted total amount to amount data property
+                this.amount = formattedTotal;
+                this.amountWithShipping = totalAmount + this.shippingFee;
+                // Return the total amount (without formatting) for further processing if needed
                 return totalAmount;
             } catch (error) {
                 console.error('Error fetching cart data:', error);
-                return 0;
+                return 0; // Return 0 in case of error
             }
         },
 
+
         formatCurrency(value) {
             const numericValue = parseFloat(value);
-            return isNaN(numericValue) ? '-' : numericValue.toLocaleString('en-KE', { style: 'currency', currency: 'KES' });
+            if (isNaN(numericValue) || numericValue === 0) {
+                return 'KES 0.00'; // Return 'KES 0.00' when the value is not a valid number or is 0
+            } else {
+                return numericValue.toLocaleString('en-KE', { style: 'currency', currency: 'KES' });
+            }
         },
+
         makePayment() {
+            // Prevent duplicate submissions if payment is already in progress
+            if (this.paymentInProgress) {
+                return;
+            }
+
             const amount = this.cartTotal;
             const phoneRegex = /^07\d{8}$/;
+            const currentDate = new Date();
+            const timestamp = currentDate.getTime(); // Get timestamp in milliseconds
+
+            // Generate a random number
+            const randomNumber = Math.floor(Math.random() * 10000); // Adjust the range as needed
+
+            // Combine timestamp and random number to create the order ID
+            this.orderId = `${timestamp}-${randomNumber}`;
+
             if (!phoneRegex.test(this.phone)) {
                 alert('Please enter a valid phone number');
                 return;
             }
+
             const paymentData = {
-                phone: this.phone,
+                phone: this.userData.phone,
                 amount: amount,
-                status: 'pending'
+                email: this.userData.email,
+                status: 'pending',
+                name: this.userData.name,
             };
 
-            axios.post('http://localhost:3000/api/mpesa/payment', paymentData)
+            // Set paymentInProgress flag to true to prevent duplicate submissions
+            this.paymentInProgress = true;
+
+            axios.post('http://localhost:3000/api/mpesa/payment', { paymentData, orderId: this.orderId })
                 .then(response => {
                     console.log(response.data);
                     // If payment is successful, you can set a flag to indicate payment success
@@ -278,9 +311,12 @@ export default {
                     console.error(error);
                     // If payment fails, set paymentFailed to true
                     this.paymentFailed = true;
+                })
+                .finally(() => {
+                    // Reset paymentInProgress flag regardless of success or failure
+                    this.paymentInProgress = false;
                 });
         },
-
         submitOrder() {
             // Check if any of the required user data fields are empty
             if (!this.userData.name || !this.userData.email || !this.userData.address || !this.userData.phone || !this.userData.location) {

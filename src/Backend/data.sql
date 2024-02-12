@@ -198,7 +198,15 @@ CREATE TABLE payments (
     status VARCHAR(20) DEFAULT 'pending', -- Payment status, defaulting to 'pending'
     payment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+ALTER TABLE payments
+ADD COLUMN customer_name VARCHAR(100),
+ADD COLUMN email VARCHAR(100);
 
+ALTER TABLE payments
+ADD COLUMN order_id SERIAL;
+
+
+SELECT * FROM payments;
 CREATE TABLE wishlist (
     wishlist_id SERIAL PRIMARY KEY,
     customer_id INT,

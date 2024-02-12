@@ -2,13 +2,13 @@ module.exports = (app, client) => {
 
     // Endpoint to handle MPesa payment submissions
     app.post('/api/mpesa/payment', async (req, res) => {
-        const { phone, amount, status } = req.body;
-
+        const { orderId, paymentData } = req.body;
+        const { phone, amount, status, name, email } = paymentData;
         try {
             // Insert payment details into the database
             const result = await client.query(
-                'INSERT INTO payments (phone, amount, status) VALUES ($1, $2, $3) RETURNING payment_id',
-                [phone, amount, status || 'pending']
+                'INSERT INTO payments (phone, amount, status, customer_name, email, order_id) VALUES ($1, $2, $3, $4, $5, $6) RETURNING payment_id',
+                [phone, amount, status, name, email, orderId]
             );
 
             const paymentId = result.rows[0].payment_id;
@@ -19,4 +19,5 @@ module.exports = (app, client) => {
             res.status(500).json({ success: false, error: 'Error inserting payment' });
         }
     });
+
 }

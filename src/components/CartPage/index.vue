@@ -32,7 +32,7 @@
                                     (-{{ ((product.price - product.sale_price) / product.price * 100).toFixed(0) }}% OFF)
                                 </span>
                                 <p class="text-gray-800 font-normal text-xl">{{ formatCurrency(product.sale_price
-                                ) }}</p>
+                                                                    ) }}</p>
                             </div>
                             <div v-else>
                                 <p class="text-gray-800 font-normal text-xl">{{ formatCurrency(product.price) }}</p>
@@ -70,7 +70,7 @@
                         <span type="text"
                             class="w-8 h-8 text-center text-gray-900 text-sm outline-none border border-gray-300 rounded-sm">
                             {{
-                                product.quantity }}
+                                                        product.quantity }}
                         </span>
                         <button @click="increaseQuantity(index)"
                             class="w-5 h-5 self-center rounded-full border border-gray-300">
@@ -83,10 +83,10 @@
 
                 </div>
                 <button @click="updateCart" :class="{
-                    'transition-colors text-sm bg-white border border-gray-600 p-2 rounded-sm w-full text-gray-700 text-hover shadow-md':
-                        isQuantityChanged,
-                    'opacity-50 cursor-not-allowed': !isQuantityChanged
-                }">
+                                    'transition-colors text-sm bg-white border border-gray-600 p-2 rounded-sm w-full text-gray-700 text-hover shadow-md':
+                                        isQuantityChanged,
+                                    'opacity-50 cursor-not-allowed': !isQuantityChanged
+                                }">
                     UPDATE CART
                 </button>
             </div>
@@ -240,7 +240,6 @@ export default {
 
         removeItem(index) {
             const itemId = this.cartData[index].product_id;
-
 
             axios.delete(`http://localhost:3000/api/removeCartItem/${itemId}`)
                 .then(response => {
