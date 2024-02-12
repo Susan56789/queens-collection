@@ -6,7 +6,8 @@
                 <span class="text-base font-normal text-gray-500">This is a list of latest transactions</span>
             </div>
             <div class="flex-shrink-0">
-                <a href="#" class="text-sm font-medium text-cyan-600 hover:bg-gray-100 rounded-lg p-2">View all</a>
+                <router-link to="/transactions"
+                    class="text-sm font-medium text-cyan-600 hover:bg-gray-100 rounded-lg p-2">View all</router-link>
             </div>
         </div>
         <div class="flex flex-col mt-8">
@@ -34,7 +35,7 @@
                                 </tr>
                             </thead>
                             <tbody class="bg-white">
-                                <tr v-for="(transaction, index) in transactions" :key="index"
+                                <tr v-for="(transaction, index) in latestTransactions" :key="index"
                                     :class="{ 'bg-gray-50': index % 2 === 1 }">
                                     <td class="p-4 whitespace-nowrap text-sm font-normal text-gray-900">
                                         Payment from <span class="font-semibold">{{ transaction.customer_name }}</span>
@@ -129,6 +130,12 @@ export default {
             newStatus: 'pending',
             selectedTransaction: null
         };
+    },
+    computed: {
+        latestTransactions() {
+            // Assuming transactions are sorted by payment_date in descending order
+            return this.transactions.slice(0, 10);
+        }
     },
     methods: {
         formatDate(dateString) {

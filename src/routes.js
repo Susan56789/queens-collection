@@ -150,6 +150,11 @@ const routes = [
                 component: () => import('./components/AdminDashboard/SummaryPage.vue')
             },
             {
+                path: '/transactions',
+                component: () => import('./components/AdminDashboard/AllTransactions.vue')
+
+            },
+            {
                 path: '/adminpage/orderpage',
                 component: () => import('./components/AdminDashboard/OrdersPage.vue')
             },

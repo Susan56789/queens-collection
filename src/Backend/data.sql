@@ -206,6 +206,26 @@ ALTER TABLE payments
 ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 ADD COLUMN order_id VARCHAR(255); 
 
+INSERT INTO payments (phone, amount, status, payment_date, customer_name, email, created_at, order_id)
+VALUES
+    ('123123123', 60.00, 'completed', NOW() - INTERVAL '1 week' + INTERVAL '3 days', 'Bob Brown', 'bob@example.com', NOW() - INTERVAL '1 week' + INTERVAL '3 days', 'order321'),
+    ('456456456', 80.00, 'completed', NOW() - INTERVAL '1 week' + INTERVAL '4 days', 'Eva Green', 'eva@example.com', NOW() - INTERVAL '1 week' + INTERVAL '4 days', 'order654'),
+    ('789789789', 120.00, 'completed', NOW() - INTERVAL '1 week' + INTERVAL '5 days', 'Michael Johnson', 'michael@example.com', NOW() - INTERVAL '1 week' + INTERVAL '5 days', 'order987'),
+    ('111222333', 90.00, 'completed', NOW() - INTERVAL '1 week' + INTERVAL '6 days', 'Sarah Lee', 'sarah@example.com', NOW() - INTERVAL '1 week' + INTERVAL '6 days', 'order111'),
+    ('444555666', 110.00, 'completed', NOW() - INTERVAL '6 days', 'David Smith', 'david@example.com', NOW() - INTERVAL '6 days', 'order444'),
+    ('777888999', 70.00, 'completed', NOW() - INTERVAL '5 days', 'Mary Johnson', 'mary@example.com', NOW() - INTERVAL '5 days', 'order777'),
+    ('101010101', 85.00, 'completed', NOW() - INTERVAL '4 days', 'Linda Brown', 'linda@example.com', NOW() - INTERVAL '4 days', 'order101'),
+    ('121212121', 95.00, 'completed', NOW() - INTERVAL '3 days', 'Chris Wilson', 'chris@example.com', NOW() - INTERVAL '3 days', 'order121'),
+    ('131313131', 105.00, 'completed', NOW() - INTERVAL '2 days', 'Emily Davis', 'emily@example.com', NOW() - INTERVAL '2 days', 'order131'),
+    ('141414141', 65.00, 'completed', NOW() - INTERVAL '1 day', 'William Taylor', 'william@example.com', NOW() - INTERVAL '1 day', 'order141'),
+    ('151515151', 75.00, 'completed', NOW(), 'Olivia Anderson', 'olivia@example.com', NOW(), 'order151'),
+    ('161616161', 55.00, 'completed', NOW() - INTERVAL '1 day', 'Daniel Martinez', 'daniel@example.com', NOW() - INTERVAL '1 day', 'order161'),
+    ('171717171', 115.00, 'completed', NOW() - INTERVAL '2 days', 'Sophia Hernandez', 'sophia@example.com', NOW() - INTERVAL '2 days', 'order171'),
+    ('181818181', 125.00, 'completed', NOW() - INTERVAL '3 days', 'James Nelson', 'james@example.com', NOW() - INTERVAL '3 days', 'order181'),
+    ('191919191', 135.00, 'completed', NOW() - INTERVAL '4 days', 'Ava White', 'ava@example.com', NOW() - INTERVAL '4 days', 'order191'),
+    ('202020202', 145.00, 'completed', NOW() - INTERVAL '5 days', 'Logan Thompson', 'logan@example.com', NOW() - INTERVAL '5 days', 'order202');
+
+
 SELECT * FROM payments;
 
 CREATE TABLE wishlist (
