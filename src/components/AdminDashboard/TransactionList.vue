@@ -133,8 +133,9 @@ export default {
     },
     computed: {
         latestTransactions() {
-            // Assuming transactions are sorted by payment_date in descending order
-            return this.transactions.slice(0, 10);
+            // Assuming transactions have a payment_id field
+            const sortedTransactions = [...this.transactions].sort((a, b) => b.payment_id - a.payment_id);
+            return sortedTransactions.slice(0, 10); // Return only the first 10 items
         }
     },
     methods: {

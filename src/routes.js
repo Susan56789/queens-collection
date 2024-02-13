@@ -155,6 +155,11 @@ const routes = [
 
             },
             {
+                path: '/all-customers',
+                component: () => import('./components/AdminDashboard/AllCustomers.vue')
+
+            },
+            {
                 path: '/adminpage/orderpage',
                 component: () => import('./components/AdminDashboard/OrdersPage.vue')
             },

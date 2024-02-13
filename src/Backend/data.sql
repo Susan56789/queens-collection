@@ -25,7 +25,9 @@ WHERE category_id = 3;
 
 DELETE FROM category
 WHERE category_id = 3;
-	
+	INSERT INTO category (category_id, category_name)
+VALUES (3, 'Accessories');
+
 select * from category;
 
 CREATE TABLE products (
@@ -39,7 +41,9 @@ CREATE TABLE products (
 	description VARCHAR(255),
     category_id INT REFERENCES category(category_id)
 );
-
+ALTER TABLE products
+ADD COLUMN quantity INT DEFAULT 1;
+UPDATE products SET quantity = 1;
 
 SELECT * FROM products ORDER BY product_id DESC LIMIT 10;
 INSERT INTO products (product_name, price, sale_price, image_path, color, product_size, description, category_id) VALUES
@@ -49,9 +53,34 @@ INSERT INTO products (product_name, price, sale_price, image_path, color, produc
 	 'Red,Cream Grey,Navy','M,L,XL,2XL','100% Polyester Adult Bathrobes',14)
 	 ;
 
-ALTER TABLE products
-ADD COLUMN quantity INT DEFAULT 1;
-UPDATE products SET quantity = 1;
+-- Generate 200 random products and insert them into the products table
+DO $$
+DECLARE
+    i INTEGER := 1;
+BEGIN
+    FOR i IN 1..200 LOOP
+        INSERT INTO products (product_name, price, sale_price, image_path, color, product_size, description, category_id)
+        VALUES (
+            -- Example product data
+            'Product ' || i,
+            -- Random price between 10 and 100
+            CAST(random() * 90 + 10 AS NUMERIC(10, 2)),
+            -- Random sale price between 5 and 90
+            CAST(random() * 85 + 5 AS NUMERIC(10, 2)),
+            -- Example image path
+            'path/to/image_' || i || '.jpg',
+            -- Example color
+            'Color ' || i,
+            -- Example product size
+            'Size ' || i,
+            -- Example description
+            'Description of product ' || i,
+            -- Random category_id between 1 and 14
+            TRUNC(random() * 14 + 1)
+        );
+    END LOOP;
+END $$;
+
 
 
 SELECT * FROM products;
@@ -71,6 +100,69 @@ CREATE TABLE customers (
 );
 Insert into customers (fname,lname,phone,gender,address,city,country,pswd,dob,email) VALUES
 ('susan','wairimu','+254796486115','female','Nairobi','Nairobi','Kenya','User1234.','03/11/2000','devnimoh@gmail.com');
+
+-- List of example city names
+CREATE TEMP TABLE city_list (
+    city_name VARCHAR(255)
+);
+INSERT INTO city_list (city_name)
+VALUES
+    ('New York'),
+    ('Los Angeles'),
+    ('Chicago'),
+    ('Houston'),
+    ('London'),
+    ('Paris'),
+    ('Tokyo'),
+    ('Sydney'),
+    ('Nairobi');
+
+-- List of example country names
+CREATE TEMP TABLE country_list (
+    country_name VARCHAR(255)
+);
+INSERT INTO country_list (country_name)
+VALUES
+    ('USA'),
+    ('UK'),
+    ('France'),
+    ('Japan'),
+    ('Australia'),
+    ('Kenya');
+
+-- Generate and insert 1000 sets of customer data into the customers table
+DO $$
+DECLARE
+    i INTEGER := 1;
+BEGIN
+    FOR i IN 1..1000 LOOP
+        INSERT INTO customers (fname, lname, phone, gender, address, city, country, pswd, dob, email)
+        VALUES (
+            -- Example customer data
+            'First' || i,
+            'Last' || i,
+            -- Example phone number (randomized)
+            '(' || LPAD(TRUNC(RANDOM() * 1000)::TEXT, 3, '0') || ') ' || LPAD(TRUNC(RANDOM() * 1000)::TEXT, 3, '0') || '-' || LPAD(TRUNC(RANDOM() * 10000)::TEXT, 4, '0'),
+            -- Random gender ('Male' or 'Female')
+            CASE TRUNC(RANDOM() * 2)
+                WHEN 0 THEN 'Male'
+                ELSE 'Female'
+            END,
+            -- Example address
+            'Address ' || i,
+            -- Randomly select a city from the city list
+            (SELECT city_name FROM city_list ORDER BY RANDOM() LIMIT 1),
+            -- Randomly select a country from the country list
+            (SELECT country_name FROM country_list ORDER BY RANDOM() LIMIT 1),
+            -- Example password
+            'password' || i,
+            -- Example date of birth (randomized)
+            CURRENT_DATE - INTERVAL '365' * TRUNC(RANDOM() * 80) - INTERVAL '1 day' * TRUNC(RANDOM() * 365),
+            -- Example email address
+            'customer' || i || '@example.com'
+        );
+    END LOOP;
+END $$;
 
 select * from customers;
 
@@ -224,6 +316,38 @@ VALUES
     ('181818181', 125.00, 'completed', NOW() - INTERVAL '3 days', 'James Nelson', 'james@example.com', NOW() - INTERVAL '3 days', 'order181'),
     ('191919191', 135.00, 'completed', NOW() - INTERVAL '4 days', 'Ava White', 'ava@example.com', NOW() - INTERVAL '4 days', 'order191'),
     ('202020202', 145.00, 'completed', NOW() - INTERVAL '5 days', 'Logan Thompson', 'logan@example.com', NOW() - INTERVAL '5 days', 'order202');
+
+-- Generate 50 random rows for the past 2 weeks
+DO $$
+DECLARE
+    i INTEGER := 1;
+BEGIN
+    FOR i IN 1..50 LOOP
+        INSERT INTO payments (phone, amount, status, payment_date, customer_name, email, created_at, order_id)
+        VALUES (
+            -- Random phone number (example format)
+            '(' || LPAD(TRUNC(RANDOM() * 1000)::TEXT, 3, '0') || ') ' || LPAD(TRUNC(RANDOM() * 1000)::TEXT, 3, '0') || '-' || LPAD(TRUNC(RANDOM() * 10000)::TEXT, 4, '0'),
+            -- Random amount between 1 and 1000
+            TRUNC(RANDOM() * 1000 + 1)::NUMERIC(10, 2),
+            -- Random status ('pending', 'completed', 'failed')
+            CASE TRUNC(RANDOM() * 3)
+                WHEN 0 THEN 'pending'
+                WHEN 1 THEN 'completed'
+                ELSE 'failed'
+            END,
+            -- Random payment date in the past 2 weeks
+            CURRENT_TIMESTAMP - INTERVAL '14 days' * RANDOM(),
+            -- Random customer name (example format)
+            'Customer ' || i,
+            -- Random email (example format)
+            'customer' || i || '@example.com',
+            -- Current timestamp as created_at
+            CURRENT_TIMESTAMP,
+            -- Random order ID (example format)
+            'ORDER' || LPAD(TRUNC(RANDOM() * 100000)::TEXT, 5, '0')
+        );
+    END LOOP;
+END $$;
 
 
 SELECT * FROM payments;

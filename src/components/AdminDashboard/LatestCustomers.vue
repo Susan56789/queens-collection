@@ -2,13 +2,14 @@
     <div class="bg-white shadow rounded-lg mb-4 p-4 sm:p-6 h-full">
         <div class="flex items-center justify-between mb-4">
             <h3 class="text-xl font-bold leading-none text-gray-900">Latest Customers</h3>
-            <a href="#" class="text-sm font-medium text-cyan-600 hover:bg-gray-100 rounded-lg inline-flex items-center p-2">
+            <router-link to="/all-customers"
+                class="text-sm font-medium text-cyan-600 hover:bg-gray-100 rounded-lg inline-flex items-center p-2">
                 View all
-            </a>
+            </router-link>
         </div>
         <div class="flow-root">
             <ul role="list" class="divide-y divide-gray-200">
-                <li v-for="(customer, index) in uniqueCustomers" :key="index" class="py-3 sm:py-4">
+                <li v-for="(customer, index) in latestCustomers" :key="index" class="py-3 sm:py-4">
                     <div class="flex items-center space-x-4">
                         <div class="flex-shrink-0">
                             <img class="h-8 w-8 rounded-full" src="/images/Logo.png" :alt="customer.customer_name">
@@ -46,8 +47,8 @@ export default {
         },
     },
     computed: {
-        uniqueCustomers() {
-            const uniqueCustomers = [];
+        latestCustomers() {
+            const latestCustomers = [];
             const customerMap = new Map(); // Use a Map to store customer email as key and total spent as value
 
             // Iterate over transactions to extract unique customer information
@@ -73,17 +74,19 @@ export default {
                 }
 
                 // Store customer name along with email and total spent
-                uniqueCustomers.push({
+                latestCustomers.push({
                     email: customerEmail,
                     customer_name: customerName, // Include customer name
                     totalSpent: customerMap.get(customerEmail) || 0 // Get total spent from Map or default to 0
                 });
             }
 
-            return uniqueCustomers;
+            // Sort latest customers by total spent in descending order
+            latestCustomers.sort((a, b) => b.totalSpent - a.totalSpent);
+
+            // Return the latest 10 customers
+            return latestCustomers.slice(0, 10);
         }
     }
 };
 </script>
-
-
