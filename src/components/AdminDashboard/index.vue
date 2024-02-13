@@ -1,12 +1,12 @@
 <template>
     <div>
-        <div class="min-h-screen flex flex-col flex-auto flex-shrink-0 antialiased bg-gray-700 text-black text-white">
+        <div class="flex flex-col flex-auto flex-shrink-0 antialiased bg-gray-700 text-black text-white">
             <!-- Header -->
             <div class="fixed w-full flex items-center justify-between h-14 text-white z-10">
                 <div
                     class="flex items-center justify-start md:justify-center pl-3 w-14 md:w-64 h-14 bg-gray-800 border-none">
                     <img class="w-7 h-7 md:w-10 md:h-10 mr-2 rounded-md overflow-hidden"
-                        src="https://therminic2018.eu/wp-content/uploads/2018/07/dummy-avatar.jpg" />
+                        src="https://therminic2018.eu/wp-content/uploads/2018/07/dummy-avatar.jpg" alt="Admin Avatar" />
                     <span class="hidden md:block">ADMIN</span>
                 </div>
                 <div class="flex justify-between items-center h-14 bg-gray-800 header-right">
@@ -22,7 +22,6 @@
                             class="w-full pl-3 text-sm text-black outline-none focus:outline-none bg-transparent" />
                     </div>
                     <ul class="flex items-center">
-
                         <li>
                             <div class="block w-px h-6 mx-3 bg-gray-400 bg-gray-700"></div>
                         </li>
@@ -42,6 +41,7 @@
                     </ul>
                 </div>
             </div>
+
             <!-- ./Header -->
             <!-- Left Side -->
             <div
@@ -156,11 +156,7 @@
             <div class="h-full ml-14 mt-14 mb-10 md:ml-64">
                 <router-view />
             </div>
-
-
             <div class="my-4"></div>
-
-
         </div>
     </div>
 </template>
