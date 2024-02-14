@@ -35,4 +35,18 @@ module.exports = (app, client) => {
         }
     });
 
+    // Endpoint to fetch all orders 
+    app.get('/api/orders', async (req, res) => {
+        try {
+            const result = await client.query('SELECT * FROM orders ');
+            const orders = result.rows;
+
+            res.json(orders);
+        } catch (error) {
+            console.error('Error fetching orders:', error);
+            res.status(500).json({ error: 'Internal Server Error' });
+        }
+    });
+
+
 }
