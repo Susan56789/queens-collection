@@ -5,7 +5,7 @@
                 <span class="text-2xl sm:text-3xl leading-none font-bold text-gray-900">{{ formatCurrency(
                     totalSummary.totalAmount)
                 }}</span>
-                <h3 class="text-base font-normal text-gray-500">Sales this week</h3>
+                <h3 class="text-base font-normal text-gray-500">Sales Last 7 days</h3>
             </div>
             <div class="flex items-center justify-end flex-1 text-base font-bold">
                 <template v-if="percentageChange === 0">
