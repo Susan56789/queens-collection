@@ -65,4 +65,20 @@ module.exports = (app, client) => {
     });
 
 
+    // Endpoint to fetch payments by email
+    app.get('/api/payments/email/:email', async (req, res) => {
+        const { email } = req.params;
+
+        try {
+            const result = await client.query('SELECT * FROM payments WHERE email = $1', [email]);
+            const orders = result.rows;
+
+            res.json(orders);
+        } catch (error) {
+            console.error('Error fetching orders:', error);
+            res.status(500).json({ error: 'Internal Server Error' });
+        }
+    });
+
+
 }

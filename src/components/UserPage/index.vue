@@ -167,7 +167,7 @@
                     <div class="my-4"></div>
 
                     <!-- Orders -->
-                    <div v-if="ordersList" class="bg-white p-3 shadow-sm rounded-sm">
+                    <div v-if="ordersList.length > 0" class="bg-white p-3 shadow-sm rounded-sm">
                         <div class="flex items-center space-x-2 font-semibold text-gray-900 leading-8 mb-3">
                             <span class="text-red-500">
                                 <svg class="h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -192,10 +192,12 @@
                                         <a href="#">{{ order.order_id }}</a>
                                     </td>
                                     <td class="py-2 px-4 border-b">{{ formatDate(order.order_date) }}</td>
-                                    <td class="py-2 px-4 border-b">Pending</td>
+                                    <td class="py-2 px-4 border-b">
+                                        <p :class="getStatusClass(order.status)">{{ order.status }}</p>
+                                    </td>
                                 </tr>
-
                             </tbody>
+
                         </table>
                     </div>
                     <div v-else class="bg-white p-3 shadow-sm rounded-sm">
@@ -226,12 +228,17 @@ export default {
             ordersList: [],
             editMode: false,
             editedUserData: {},
+            orderAmount: 0,
+            email: null
+
         };
     },
 
     async created() {
         await this.fetchUser();
         await this.fetchOrders();
+        await this.fetchTransactions(this.email);
+
     },
 
     methods: {
@@ -263,57 +270,100 @@ export default {
                     return 'th';
             }
         },
-
+        getStatusClass(status) {
+            switch (status) {
+                case 'pending':
+                    return 'pending';
+                case 'failed':
+                    return 'failed';
+                case 'completed':
+                    return 'completed';
+                default:
+                    return 'unknown';
+            }
+        },
         async fetchUser() {
             try {
                 const userDataQueryParam = this.$route.query.userData;
 
                 if (userDataQueryParam) {
                     // Parse the query parameter string to JSON
-                    this.localUserData = JSON.parse(decodeURIComponent(userDataQueryParam));
-
+                    const userData = JSON.parse(decodeURIComponent(userDataQueryParam));
+                    this.localUserData = userData[0]; // Assuming userData is an array with a single user object
+                    this.email = this.localUserData.email
                     this.saveUserDataToLocalStorage();
-                    return;
                 } else {
+                    // Check if user data is stored in local storage and not expired
+                    const storedUserData = localStorage.getItem('userData');
+                    const storedTimestamp = localStorage.getItem('userDataTimestamp');
 
+                    if (storedUserData && storedTimestamp && Date.now() - storedTimestamp < 30 * 60 * 1000) {
+                        this.localUserData = JSON.parse(storedUserData);
+                    } else {
+                        // Otherwise, fetch user data using the userService
+                        const fetchedUserData = await userService.getUserData();
+                        this.localUserData = fetchedUserData;
+                        // Save user data to local storage with a timestamp
+                        this.saveUserDataToLocalStorage();
+                    }
+                }
+
+                // If localUserData is still null, redirect to login
+                if (!this.localUserData) {
                     this.$router.push('/login');
-
-                }
-                // Check if user data is stored in local storage and not expired
-                const storedUserData = localStorage.getItem('userData');
-                const storedTimestamp = localStorage.getItem('userDataTimestamp');
-
-                if (storedUserData && storedTimestamp && Date.now() - storedTimestamp < 30 * 60 * 1000) {
-                    this.localUserData = JSON.parse(storedUserData);
-
-                } else {
-                    // Otherwise, fetch user data using the userService
-                    const fetchedUserData = await userService.getUserData();
-                    this.localUserData = fetchedUserData;
-                    // Save user data to local storage with a timestamp
-                    this.saveUserDataToLocalStorage();
-
-                    await this.fetchOrders(this.localUserData.email); // Fetch orders after user data is obtained
+                    return;
                 }
 
+                // Fetch orders after user data is obtained
+                await this.fetchOrders(this.localUserData.email); // Pass the email from localUserData
             } catch (error) {
                 console.error('Error fetching user data:', error);
             }
         },
+
+
         saveUserDataToLocalStorage() {
             localStorage.setItem('userData', JSON.stringify(this.localUserData));
             localStorage.setItem('userDataTimestamp', Date.now());
         },
-        async fetchOrders(email) {
-            email = this.localUserData.email
+        async fetchTransactions(email) {
             try {
+                this.loading = true;
+                const response = await axios.get(`http://localhost:3000/api/payments/email/${email}`);
+
+                for (const transaction of response.data) {
+                    const paymentDate = new Date(transaction.payment_date);
+                    for (const order of this.ordersList) {
+                        const orderDate = new Date(order.order_date);
+                        if (paymentDate.toDateString() === orderDate.toDateString()) {
+                            // Update the status of the current order
+                            order.status = transaction.status;
+                            break; // Break out of the loop after updating the status
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching transactions:', error);
+            } finally {
+                this.loading = false;
+            }
+        },
+
+
+        async fetchOrders(email) {
+            email = this.email
+            try {
+                // Ensure that email is properly set
+                if (!email) {
+                    console.error('Email is not provided.');
+                    return;
+                }
+
                 const response = await fetch(`http://localhost:3000/api/orders/email/${email}`);
                 if (!response.ok) {
                     throw new Error('Failed to fetch orders');
                 }
                 const orders = await response.json();
-
-                // Sort orders by product_id in descending order
                 const sortedOrders = orders.sort((a, b) => b.order_id - a.order_id);
 
                 // Select the latest 10 orders
@@ -321,12 +371,12 @@ export default {
 
                 // Assign latest orders to the ordersList data property
                 this.ordersList = latestOrders;
-
             } catch (error) {
                 console.error('Error fetching orders:', error);
                 // Handle error, e.g., show a notification to the user
             }
         },
+
 
         logout() {
             userService.logout();
@@ -404,5 +454,33 @@ export default {
 
 .border-main-color {
     border-color: var(--main-color);
+}
+
+.pending {
+    color: chartreuse;
+}
+
+.failed {
+    color: red;
+}
+
+.completed {
+    color: green;
+}
+
+.unknown {
+    color: blue;
+}
+
+.edit {
+    color: black;
+}
+
+.processing {
+    color: chocolate;
+}
+
+#status {
+    color: black;
 }
 </style>

@@ -249,6 +249,8 @@ CREATE TABLE orders (
     order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+ALTER TABLE orders ADD COLUMN status VARCHAR(255) DEFAULT 'pending';
+
 
 CREATE TABLE order_items (
     item_id SERIAL PRIMARY KEY,
@@ -297,6 +299,29 @@ ADD COLUMN email VARCHAR(100);
 ALTER TABLE payments
 ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 ADD COLUMN order_id VARCHAR(255); 
+
+-- Create a trigger function to update order status
+CREATE OR REPLACE FUNCTION update_order_status()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Update the status of orders when a payment status changes
+    UPDATE orders
+    SET status = NEW.status
+    WHERE total_amount = NEW.amount
+    AND order_date = NEW.payment_date;
+    
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create a trigger to call the update_order_status function after updating payments table
+CREATE TRIGGER trigger_update_order_status
+AFTER UPDATE OF status ON payments
+FOR EACH ROW
+EXECUTE FUNCTION update_order_status();
+
+
+
 
 INSERT INTO payments (phone, amount, status, payment_date, customer_name, email, created_at, order_id)
 VALUES
