@@ -1,17 +1,23 @@
+import { createApp } from 'vue';
+import App from './App.vue';
+import router from './routes'; // Assuming you've defined your routes in a separate file called 'routes.js'
+import axios from 'axios';
+import VueRouter from 'vue-router';
+
+// Import CSS files
 import './assets/css/tailwind.css';
-
 import '@fortawesome/fontawesome-free/css/all.css';
-import { createApp } from 'vue'
-import App from './App.vue'
-import router from './routes'
 
-import axios from 'axios'
+const app = createApp(App);
 
+// Use Vue Router
+app.use(VueRouter);
 
-const app = createApp(App)
+// Use Axios globally
+app.config.globalProperties.$axios = axios;
+
+// Set up the router
 app.use(router);
 
-// Set up Axios globally
-app.config.globalProperties.$axios = axios
-
-app.mount('#app')
+// Mount the app
+app.mount('#app');

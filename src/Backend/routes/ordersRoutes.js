@@ -48,5 +48,18 @@ module.exports = (app, client) => {
         }
     });
 
+    // Route to fetch order items by order ID
+    app.get('/api/orders/:orderId/items', async (req, res) => {
+        const { orderId } = req.params;
+        try {
+
+            const result = await client.query('SELECT * FROM order_items WHERE order_id = $1', [orderId]);
+            const orderItems = result.rows;
+            res.json(orderItems);
+        } catch (err) {
+            console.error('Error executing query', err);
+            res.status(500).json({ error: 'Internal Server Error' });
+        }
+    });
 
 }

@@ -97,7 +97,6 @@ const routes = [
             },
             // Customers Route
             {
-
                 path: '/user-account',
                 component: () => import('./components/UserPage/index.vue'),
                 name: 'UserPage',
@@ -116,6 +115,14 @@ const routes = [
                 },
 
             },
+
+            {
+                path: 'orders/:orderId',
+                component: () => import('./components/UserPage/OrderItem.vue'),
+                name: 'OrderItems',
+                props: true
+            }
+            ,
             {
                 path: '/:pathMatch(.*)*',
                 component: () => import('./components/404Page.vue')
@@ -159,6 +166,8 @@ const routes = [
                 component: () => import('./components/AdminDashboard/AllCustomers.vue')
 
             },
+
+
             {
                 path: '/adminpage/orderpage',
                 component: () => import('./components/AdminDashboard/OrdersPage.vue')

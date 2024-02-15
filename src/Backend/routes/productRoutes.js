@@ -110,4 +110,23 @@ module.exports = (app, client) => {
         }
     });
 
+    // Endpoint to fetch product by ID
+    app.get('/api/products/:productId', async (req, res) => {
+        const productId = req.params.productId;
+
+        try {
+            const query = 'SELECT * FROM products WHERE product_id = $1';
+            const result = await client.query(query, [productId]);
+
+            if (result.rows.length === 0) {
+                res.status(404).json({ error: 'Product not found' });
+            } else {
+                res.json(result.rows[0]);
+            }
+        } catch (error) {
+            console.error('Error fetching product:', error);
+            res.status(500).json({ error: 'Internal server error' });
+        }
+    });
+
 }

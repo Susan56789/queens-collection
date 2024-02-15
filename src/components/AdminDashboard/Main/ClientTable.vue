@@ -16,6 +16,7 @@
                     <tbody v-if="pagedTransactions.length > 0" class="bg-white divide-y dark:divide-gray-700 bg-gray-800">
                         <tr v-for="(customer, index) in pagedTransactions" :key="index"
                             class="bg-gray-50 bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-700 dark:text-gray-400">
+
                             <td class="px-4 py-3">
                                 <div class="flex items-center text-sm">
                                     <div class="relative hidden w-8 h-8 mr-3 rounded-full md:block">
@@ -101,15 +102,20 @@ export default {
     data() {
         return {
             loading: false,
+            ordersList: [],
             latestCustomers: [],
             currentPage: 1,
             pageSize: 15,
             totalPages: 0,
-            totalCustomers: 0
+            totalCustomers: 0,
+            email: null,
+
         };
     },
-    created() {
-        this.fetchTransactions();
+    async created() {
+        await this.fetchTransactions();
+
+
     },
     computed: {
         pagedTransactions() {
@@ -119,9 +125,10 @@ export default {
         }
     },
     methods: {
-        fetchTransactions() {
+
+        async fetchTransactions() {
             this.loading = true;
-            this.$axios.get(`http://localhost:3000/api/transactions`)
+            await this.$axios.get(`http://localhost:3000/api/transactions`)
                 .then(response => {
                     // Sort transactions by payment_date in descending order
                     response.data.sort((a, b) => new Date(b.payment_date) - new Date(a.payment_date));
@@ -139,6 +146,9 @@ export default {
 
                     this.totalPages = Math.ceil(this.latestCustomers.length / this.pageSize);
 
+                    this.latestCustomers.forEach((customer => {
+                        this.email = customer.email
+                    }))
                     this.loading = false;
                 })
                 .catch(error => {

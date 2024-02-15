@@ -189,7 +189,7 @@
                             <tbody>
                                 <tr v-for="(order, index) in ordersList" :key="index" class="">
                                     <td class="hover:bg-gray-100 cursor-pointer py-2 px-4 border-b">
-                                        <a href="#">{{ order.order_id }}</a>
+                                        <router-link :to="'/orders/' + order.order_id"> {{ order.order_id }}</router-link>
                                     </td>
                                     <td class="py-2 px-4 border-b">{{ formatDate(order.order_date) }}</td>
                                     <td class="py-2 px-4 border-b">
@@ -197,6 +197,7 @@
                                     </td>
                                 </tr>
                             </tbody>
+
 
                         </table>
                     </div>
@@ -327,6 +328,7 @@ export default {
             localStorage.setItem('userDataTimestamp', Date.now());
         },
         async fetchTransactions(email) {
+
             try {
                 this.loading = true;
                 const response = await axios.get(`http://localhost:3000/api/payments/email/${email}`);
