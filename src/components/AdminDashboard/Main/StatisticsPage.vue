@@ -13,8 +13,8 @@
                 </svg>
             </div>
             <div class="text-right">
-                <p class="text-2xl">{{ customers }}</p>
-                <p>Customers </p>
+                <p class="text-sm">{{ customers }}</p>
+                <p class="text-sm">Customers </p>
             </div>
         </div>
         <div
@@ -28,8 +28,8 @@
                 </svg>
             </div>
             <div class="text-right">
-                <p class="text-2xl">{{ orders }}</p>
-                <p>Orders</p>
+                <p class="text-sm">{{ orders }}</p>
+                <p class="text-sm">Orders</p>
             </div>
         </div>
         <div
@@ -43,9 +43,9 @@
                 </svg>
             </div>
             <div class="text-right">
-                <p class="text-2xl">{{ formatCurrency(
+                <p class="text-sm">{{ formatCurrency(
                     totalAmount) }}</p>
-                <p>Sales</p>
+                <p class="text-sm">Sales</p>
             </div>
         </div>
         <div
@@ -60,8 +60,8 @@
                 </svg>
             </div>
             <div class="text-right">
-                <p class="text-2xl">{{ formatCurrency(failedSales) }}</p>
-                <p>Failed/Refunds</p>
+                <p class="text-sm">{{ formatCurrency(failedSales) }}</p>
+                <p class="text-sm">Failed/Refunds</p>
             </div>
         </div>
     </div>
