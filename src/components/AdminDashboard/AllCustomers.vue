@@ -26,13 +26,49 @@
         <div v-else>
             <p class="text-gray-500">No customers available.</p>
         </div>
-        <!-- Pagination Controls -->
-        <div class="flex justify-center mt-4">
-            <button @click="prevPage" :disabled="currentPage === 1"
-                class="mr-2 px-4 py-2 bg-red-200 text-gray-600 rounded hover:bg-red-300 focus:outline-none focus:bg-red-300">Previous</button>
-            <span class="px-4 py-2 text-gray-600">{{ currentPage }}</span>
-            <button @click="nextPage" :disabled="currentPage === totalPages"
-                class="px-4 py-2 bg-red-200 text-gray-600 rounded hover:bg-red-300 focus:outline-none focus:bg-red-300">Next</button>
+        <div
+            class="grid px-4 py-3 text-xs font-semibold tracking-wide 
+            text-white-500 uppercase border-t dark:border-gray-700 bg-red-500 sm:grid-cols-9 dark:text-white-400 bg-red-800">
+            <span class="flex items-center col-span-3"> Showing {{ pagedTransactions.length }} of {{ totalCustomers }}
+            </span>
+            <span class="col-span-2"></span>
+
+            <!-- Pagination -->
+            <span class="flex col-span-4 mt-2 sm:mt-auto sm:justify-end">
+                <nav aria-label="Table navigation">
+                    <ul class="inline-flex items-center">
+                        <li>
+                            <button @click="prevPage"
+                                class="px-3 py-1 rounded-md rounded-l-lg focus:outline-none focus:shadow-outline-purple"
+                                aria-label="Previous">
+                                <svg aria-hidden="true" class="w-4 h-4 fill-current" viewBox="0 0 20 20">
+                                    <path
+                                        d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                                        clip-rule="evenodd" fill-rule="evenodd"></path>
+                                </svg>
+                            </button>
+                        </li>
+                        <!-- Render dynamic pagination buttons -->
+                        <li v-for="pageNumber in totalPages" :key="pageNumber">
+                            <button @click="changePage(pageNumber)"
+                                :class="['px-3 py-1 rounded-md focus:outline-none focus:shadow-outline-purple', { 'text-white dark:text-gray-800 transition-colors duration-150 bg-blue-600 dark:bg-gray-100 border border-r-0 border-blue-600 dark:border-gray-100 rounded-md': pageNumber === currentPage }]"
+                                aria-label="Go to Page {{ pageNumber }}">{{ pageNumber }}</button>
+                        </li>
+                        <li>
+                            <button @click="nextPage"
+                                class="px-3 py-1 rounded-md rounded-r-lg focus:outline-none focus:shadow-outline-purple"
+                                aria-label="Next">
+                                <svg class="w-4 h-4 fill-current" aria-hidden="true" viewBox="0 0 20 20">
+                                    <path
+                                        d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                                        clip-rule="evenodd" fill-rule="evenodd"></path>
+                                </svg>
+                            </button>
+                        </li>
+                    </ul>
+                </nav>
+            </span>
+
         </div>
     </div>
 </template>
@@ -48,7 +84,8 @@ export default {
             latestCustomers: [],
             currentPage: 1,
             pageSize: 50,
-            totalPages: 0
+            totalPages: 0,
+            totalCustomers: 0
         };
     },
     created() {
@@ -76,7 +113,7 @@ export default {
                         totalSpent: parseFloat(transaction.amount)
                     }));
                     this.latestCustomers = latestCustomer;
-
+                    this.totalCustomers = this.latestCustomers.length
                     this.totalPages = Math.ceil(this.latestCustomers.length / this.pageSize);
 
                     this.loading = false;
@@ -105,7 +142,11 @@ export default {
                 this.currentPage--;
                 this.fetchTransactions();
             }
-        }
+        },
+        changePage(pageNumber) {
+            this.currentPage = pageNumber;
+            this.fetchTransactions();
+        },
     },
     mounted() {
         this.fetchTransactions();
