@@ -52,17 +52,51 @@
                         </tbody>
                     </table>
                 </div>
-                <!-- Pagination -->
-                <div class="flex justify-center mt-4">
-                    <button @click="prevPage" :disabled="currentPage === 1"
-                        class="px-3 py-1 mx-1 rounded-md focus:outline-none">Previous</button>
-                    <button v-for="pageNumber in pageCount" :key="pageNumber" @click="setCurrentPage(pageNumber)"
-                        :class="{ 'bg-red-500 text-white': currentPage === pageNumber, 'bg-gray-200': currentPage !== pageNumber }"
-                        class="px-3 py-1 mx-1 rounded-md focus:outline-none">
-                        {{ pageNumber }}
-                    </button>
-                    <button @click="nextPage" :disabled="currentPage === pageCount"
-                        class="px-3 py-1 mx-1 rounded-md focus:outline-none">Next</button>
+                <div
+                    class="grid px-4 py-3 text-xs font-semibold tracking-wide 
+            text-white-500 uppercase border-t dark:border-gray-700 bg-red-500 sm:grid-cols-9 dark:text-white-400 bg-red-800">
+                    <span class="flex items-center col-span-3"> Showing {{ pagedTransactions.length }} of {{
+                        totalTransactions
+                    }}
+                    </span>
+                    <span class="col-span-2"></span>
+
+                    <!-- Pagination -->
+                    <span class="flex col-span-4 mt-2 sm:mt-auto sm:justify-end">
+                        <nav aria-label="Table navigation">
+                            <ul class="inline-flex items-center">
+                                <li>
+                                    <button @click="prevPage"
+                                        class="px-3 py-1 rounded-md rounded-l-lg focus:outline-none focus:shadow-outline-purple"
+                                        aria-label="Previous">
+                                        <svg aria-hidden="true" class="w-4 h-4 fill-current" viewBox="0 0 20 20">
+                                            <path
+                                                d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                                                clip-rule="evenodd" fill-rule="evenodd"></path>
+                                        </svg>
+                                    </button>
+                                </li>
+                                <!-- Render dynamic pagination buttons -->
+                                <li v-for="pageNumber in totalPages" :key="pageNumber">
+                                    <button @click="changePage(pageNumber)"
+                                        :class="['px-3 py-1 rounded-md focus:outline-none focus:shadow-outline-purple', { 'text-white dark:text-gray-800 transition-colors duration-150 bg-blue-600 dark:bg-gray-100 border border-r-0 border-blue-600 dark:border-gray-100 rounded-md': pageNumber === currentPage }]"
+                                        aria-label="Go to Page {{ pageNumber }}">{{ pageNumber }}</button>
+                                </li>
+                                <li>
+                                    <button @click="nextPage"
+                                        class="px-3 py-1 rounded-md rounded-r-lg focus:outline-none focus:shadow-outline-purple"
+                                        aria-label="Next">
+                                        <svg class="w-4 h-4 fill-current" aria-hidden="true" viewBox="0 0 20 20">
+                                            <path
+                                                d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                                                clip-rule="evenodd" fill-rule="evenodd"></path>
+                                        </svg>
+                                    </button>
+                                </li>
+                            </ul>
+                        </nav>
+                    </span>
+
                 </div>
             </div>
         </div>
@@ -79,7 +113,9 @@ export default {
             transactions: [],
             loading: false,
             currentPage: 1,
-            pageSize: 50
+            pageSize: 50,
+            totalPages: 0,
+            totalTransactions: 0
         };
     },
     created() {
@@ -100,7 +136,11 @@ export default {
             this.loading = true;
             axios.get('http://localhost:3000/api/transactions')
                 .then(response => {
-                    this.transactions = response.data;
+                    // Sort transactions by payment_date in descending order
+                    this.transactions = response.data.sort((a, b) => new Date(b.payment_date) - new Date(a.payment_date));
+
+                    this.totalPages = Math.ceil(this.transactions.length / this.pageSize);
+                    this.totalTransactions = this.transactions.length
                     this.loading = false;
                 })
                 .catch(error => {
@@ -144,7 +184,11 @@ export default {
             if (this.currentPage > 1) {
                 this.currentPage--;
             }
-        }
+        },
+        changePage(pageNumber) {
+            this.currentPage = pageNumber;
+            this.fetchTransactions();
+        },
     }
 };
 </script>
