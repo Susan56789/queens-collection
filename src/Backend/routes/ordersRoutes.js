@@ -62,4 +62,16 @@ module.exports = (app, client) => {
         }
     });
 
+    // Route to handle updating order status
+    app.post('/api/updateStatus', async (req, res) => {
+        const { order_id, newStatus } = req.body;
+        try {
+            const result = await client.query('UPDATE orders SET status = $1 WHERE order_id = $2', [newStatus, order_id]);
+            res.json({ success: true, message: 'Order status updated successfully' });
+        } catch (error) {
+            console.error('Error updating orders status:', error);
+            res.status(500).json({ success: false, error: 'Internal server error' });
+        }
+    });
+
 }
