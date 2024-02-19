@@ -177,6 +177,10 @@ const routes = [
                 component: () => import('./components/AdminDashboard/OrdersPage/index.vue')
             },
             {
+                path: '/adminpage/profile',
+                component: () => import('./components/AdminDashboard/ProfilePage.vue')
+            },
+            {
                 path: '/adminpage/newproduct',
                 component: () => import('./components/AdminDashboard/AddProducts.vue')
             }
